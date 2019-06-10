@@ -5,8 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SharpBladeFlightAnalyzer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="700" Width="1000" MinHeight="700" MinWidth="1000">
+	<Window.Resources>
+
+	</Window.Resources>
+	<Grid Background="Gray">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="200" MinWidth="200" MaxWidth="500"/>
+			<ColumnDefinition Width="3"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+		<ListView Background="Red"/>
+
+		<GridSplitter x:Name="gridSplitter" Grid.Column="1" Width="3" HorizontalAlignment="Center"/>
+		<TabControl Grid.Column="2">
+			<local:TabPage Header="New">
+				
+			</local:TabPage>
+            <local:TabPage Header="New2"/>
+            <local:TabPage Header="New3"/>
+            <local:TabPage Header="New4"/>
+            <local:TabPage Header="New4"/>
+            <local:TabPage Header="New4"/>
+        </TabControl>
+	</Grid>
 </Window>
