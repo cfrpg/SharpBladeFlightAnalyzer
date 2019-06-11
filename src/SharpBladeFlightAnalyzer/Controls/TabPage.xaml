@@ -29,7 +29,7 @@
 	</TabItem.Resources>
 	<TabItem.Style>
 		<Style TargetType="{x:Type TabItem}">
-			<Setter Property="BorderBrush" Value="Black"></Setter>
+			<Setter Property="BorderBrush" Value="Gray"></Setter>
 			<Setter Property="Background" Value="LightGray"></Setter>
 			<Setter Property="Foreground" Value="Black"></Setter>
 			<Setter Property="Padding" Value="5,0,0,0"></Setter>
@@ -38,7 +38,7 @@
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type TabItem}">
-						<Border CornerRadius="0,0,0,0" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+						<Border CornerRadius="0,0,0,0" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,0" Background="{TemplateBinding Background}">
 							<Grid MinWidth="20">
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="*" MinWidth="20"></ColumnDefinition>
@@ -46,14 +46,13 @@
 									<ColumnDefinition Width="5"></ColumnDefinition>
 								</Grid.ColumnDefinitions>
 								<ContentPresenter Grid.Column="0" ContentSource="Header" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}"></ContentPresenter>
-								<Button Grid.Column="1" Name="btn_Close" Style="{StaticResource CloseButtonStyle}" Click="btn_Close_Click" Margin="0,5"></Button>
+								<Button Grid.Column="1" x:Name="btn_Close" Style="{StaticResource CloseButtonStyle}" Click="btn_Close_Click" Margin="0,5"></Button>
 							</Grid>
 						</Border>
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsSelected" Value="true">
-								<Setter Property="Background" Value="White"></Setter>
-								
-							</Trigger>
+								<Setter Property="Background" Value="White"></Setter>								
+							</Trigger>                           
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
 				</Setter.Value>
