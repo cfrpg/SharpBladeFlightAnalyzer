@@ -87,7 +87,8 @@
     <Compile Include="Controls\TabPage.xaml.cs">
       <DependentUpon>TabPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ULogFileReader.cs" />
+    <Compile Include="DataField.cs" />
+    <Compile Include="ULogFile.cs" />
     <Page Include="Controls\TabPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
