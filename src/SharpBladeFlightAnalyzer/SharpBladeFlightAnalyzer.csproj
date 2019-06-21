@@ -88,6 +88,7 @@
       <DependentUpon>TabPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataField.cs" />
+    <Compile Include="LoggedMessage.cs" />
     <Compile Include="ULogFile.cs" />
     <Page Include="Controls\TabPage.xaml">
       <SubType>Designer</SubType>

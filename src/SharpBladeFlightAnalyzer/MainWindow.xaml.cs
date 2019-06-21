@@ -23,7 +23,9 @@ namespace SharpBladeFlightAnalyzer
 	{
 		public MainWindow()
 		{
-			InitializeComponent();			
+			InitializeComponent();
+			ULogFile f = new ULogFile();
+			f.Load("D:\\temp\\log.ulg",1024);
 		}
 	}
 }

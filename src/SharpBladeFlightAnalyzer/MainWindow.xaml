@@ -149,9 +149,9 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                         <ListViewItem Height="200" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                            <d3:Chart >
-
-                            </d3:Chart>
+                            <Canvas>
+                                <d3:Chart Width="180" Height="180" />
+                            </Canvas>                        
                         </ListViewItem>
                         <ListViewItem Height="200" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                             <d3:Chart >
