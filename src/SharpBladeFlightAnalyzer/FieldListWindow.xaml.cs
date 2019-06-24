@@ -10,22 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Diagnostics;
 
 namespace SharpBladeFlightAnalyzer
 {
 	/// <summary>
-	/// MainWindow.xaml 的交互逻辑
+	/// FieldListWindow.xaml 的交互逻辑
 	/// </summary>
-	public partial class MainWindow : Window
+	public partial class FieldListWindow : Window
 	{
-		public MainWindow()
+		public FieldListWindow()
 		{
 			InitializeComponent();
-			//ULogFile f = new ULogFile();
-			//f.Load("D:\\temp\\log.ulg",1024);
 		}
 	}
 }

@@ -176,7 +176,7 @@ namespace SharpBladeFlightAnalyzer
 			string[] fieldNames = defstr.Split(';');
 
 			List<Tuple<string, string>> fieldList = new List<Tuple<string, string>>();
-
+			string tstr;
 			for (int i = 0; i < fieldNames.Length; i++)
 			{
 				if (fieldNames[i].Length == 0)
@@ -191,12 +191,18 @@ namespace SharpBladeFlightAnalyzer
 					int len = getArrayLength(ref realType);
 					for (int j = 0; j < len; j++)
 					{
-						fieldList.Add(new Tuple<string, string>(realType, msgname + "." + field[1] + "[" + j.ToString() + "]"));
+						tstr = msgname + "." + field[1] + "[" + j.ToString() + "]";
+						fieldList.Add(new Tuple<string, string>(realType, tstr));
+						if (tstr.IndexOf("._padding") < 0 || tstr.IndexOf("timestamp") < 0)
+							fieldDict.Add(tstr, new DataField(tstr));
 					}
 				}
 				else
 				{
-					fieldList.Add(new Tuple<string, string>(field[0], msgname + "." + field[1]));
+					tstr = msgname + "." + field[1];
+					fieldList.Add(new Tuple<string, string>(field[0], tstr));
+					if (tstr.IndexOf("._padding") < 0 || tstr.IndexOf("timestamp") < 0)
+						fieldDict.Add(tstr, new DataField(tstr));
 				}
 			}
 			fieldNameDict.Add(msgname, fieldList);
@@ -328,8 +334,77 @@ namespace SharpBladeFlightAnalyzer
 
 		private bool readLoggedData(ushort msglen)
 		{
-			//not use
-			reader.ReadBytes(msglen);
+			List<string> names = new List<string>();
+			List<double> values = new List<double>();
+			double ts=0;
+			ushort msgid = reader.ReadUInt16();
+			string msgname = msgNameDict[msgid];
+			List<Tuple<string, string>> fields = fieldNameDict[msgname];
+
+			double value = 0;
+			int size = 0;
+			foreach(var v in fields)
+			{
+				if (size >= msglen - 2)
+					break;
+				size += typeSize[v.Item1];
+				switch(v.Item1)
+				{
+					case "int8_t":
+						value = reader.ReadSByte();
+						break;
+					case "uint8_t":
+						value = reader.ReadByte();
+						break;
+					case "int16_t":
+						value = reader.ReadInt16();
+						break;
+					case "uint16_t":
+						value = reader.ReadUInt16();
+						break;
+					case "int32_t":
+						value = reader.ReadInt32();
+						break;
+					case "uint32_t":
+						value = reader.ReadUInt32();
+						break;
+					case "int64_t":
+						value = reader.ReadInt64();
+						break;
+					case "uint64_t":
+						value = reader.ReadUInt64();
+						break;
+					case "float":
+						value = reader.ReadSingle();
+						break;
+					case "double":
+						value = reader.ReadDouble();
+						break;
+					case "bool":
+						value = reader.ReadBoolean() ? 1 : 0;
+						break;
+					case "char":
+						value = reader.ReadByte();
+						break;
+				}
+				if (v.Item2.IndexOf("._padding") >= 0)
+					continue;
+				if (v.Item2.IndexOf("timestamp") >= 0)
+				{
+					ts = (value-timestamp)/1.0e6;
+					continue;
+				}
+				names.Add(v.Item2);
+				values.Add(value);
+			}
+			for (int i = 0; i < names.Count; i++)
+			{
+				//if(!fieldDict.ContainsKey(names[i]))
+				//{
+				//	fieldDict.Add(names[i], new DataField(names[i]));
+				//}
+				fieldDict[names[i]].Data.Add(new Tuple<double, double>(ts, values[i]));
+			}
 			return true;
 		}
 

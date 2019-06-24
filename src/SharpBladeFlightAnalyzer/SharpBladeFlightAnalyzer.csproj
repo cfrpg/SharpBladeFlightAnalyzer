@@ -84,13 +84,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\LogPageControl.xaml.cs">
+      <DependentUpon>LogPageControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TabPage.xaml.cs">
       <DependentUpon>TabPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataField.cs" />
+    <Compile Include="FieldListWindow.xaml.cs">
+      <DependentUpon>FieldListWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LoggedMessage.cs" />
     <Compile Include="ULogFile.cs" />
+    <Page Include="Controls\LogPageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\TabPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FieldListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
