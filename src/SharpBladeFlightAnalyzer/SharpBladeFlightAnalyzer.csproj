@@ -94,7 +94,9 @@
     <Compile Include="FieldListWindow.xaml.cs">
       <DependentUpon>FieldListWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Graph.cs" />
     <Compile Include="LoggedMessage.cs" />
+    <Compile Include="Polar.cs" />
     <Compile Include="ULogFile.cs" />
     <Page Include="Controls\LogPageControl.xaml">
       <SubType>Designer</SubType>

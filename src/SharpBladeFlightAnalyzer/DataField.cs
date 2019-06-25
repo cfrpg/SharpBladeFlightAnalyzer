@@ -10,6 +10,7 @@ namespace SharpBladeFlightAnalyzer
 	{
 		string name;
 		string description;
+		SpecialField flag;
 		
 		List<Tuple<double, double>> data;
 
@@ -31,10 +32,31 @@ namespace SharpBladeFlightAnalyzer
 			set { description = value; }
 		}
 
+		public SpecialField Flag
+		{
+			get { return flag; }
+			set { flag = value; }
+		}
+
 		public DataField(string n)
 		{
 			name = n;
 			data = new List<Tuple<double, double>>();
+			flag = SpecialField.None;
 		}
+
+		public DataField(string n,SpecialField sf)
+		{
+			name = n;
+			data = new List<Tuple<double, double>>();
+			flag = sf;
+		}
+	}
+
+	public enum SpecialField
+	{
+		None,
+		TimeStamp,
+		Padding
 	}
 }

@@ -21,6 +21,7 @@ namespace SharpBladeFlightAnalyzer
 	public partial class LogPageControl : UserControl
 	{
 		ULogFile logFile;
+		
 		public LogPageControl(ULogFile uf)
 		{
 			InitializeComponent();

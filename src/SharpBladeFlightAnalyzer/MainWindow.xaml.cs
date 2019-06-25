@@ -29,12 +29,18 @@ namespace SharpBladeFlightAnalyzer
 		{
 			InitializeComponent();
 			fieldListWindow = new FieldListWindow();
+			fieldListWindow.okBtn.Click += OkBtn_Click;
 
 			ULogFile f = new ULogFile();
-			f.Load("D:\\temp\\log.ulg",1024);
+			f.Load("D:\\temp\\log.ulg", 1024);
 			LogPageControl lpc = new LogPageControl(f);
 			testPage.Content = lpc;
 			currentPage = (LogPageControl)((TabPage)mainTabControl.Items[0]).Content;
+		}
+
+		private void OkBtn_Click(object sender, RoutedEventArgs e)
+		{
+			
 		}
 
 		private void addFieldBtn_Click(object sender, RoutedEventArgs e)

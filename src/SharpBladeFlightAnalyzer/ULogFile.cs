@@ -24,7 +24,7 @@ namespace SharpBladeFlightAnalyzer
 		//ID,msgName
 		Dictionary<ushort, string> msgNameDict;
 		//msgName,fieldList<Type,fieldName>
-		Dictionary<string, List<Tuple<string, string>>> fieldNameDict;
+		Dictionary<string, List<Tuple<string, DataField>>> fieldNameDict;		
 		//fieldFullName,DataField
 		Dictionary<string, DataField> fieldDict;
 		//key,value
@@ -103,12 +103,12 @@ namespace SharpBladeFlightAnalyzer
 		{
 			appendedOffset = new UInt64[3] { 0, 0, 0 };
 			msgNameDict=new Dictionary<ushort, string>();
-			fieldNameDict=new Dictionary<string, List<Tuple<string, string>>>();
+			fieldNameDict=new Dictionary<string, List<Tuple<string, DataField>>>();
 			FieldDict=new Dictionary<string, DataField>();
 			infomations=new List<Tuple<string, string>>();
 			parameters=new List<Tuple<string, float>>();
 			Messages = new List<LoggedMessage>();
-			dataFields = new List<DataField>();
+			dataFields = new List<DataField>();			
 		}
 
 		public bool Load(string path, int buffsize)
@@ -133,17 +133,21 @@ namespace SharpBladeFlightAnalyzer
 			version = buff[7];
 			timestamp = reader.ReadUInt64();
 			section = 0;
-			while (readMessage()) ;			
-			foreach(var v in FieldDict)
-			{				
-				//if(v.Value.Data.Count!=0)
+			while (readMessage()) ;
+			fieldDict.Clear();
+			foreach(var v in fieldNameDict)
+			{
+				foreach (var v1 in v.Value)
 				{
-					dataFields.Add(v.Value);
+					if (v1.Item2.Flag == SpecialField.None && v1.Item2.Data.Count != 0)
+					{
+						fieldDict.Add(v1.Item2.Name, v1.Item2);
+						dataFields.Add(v1.Item2);
+					}
 				}
-			}		
+			}			
 			msgNameDict.Clear();
 			fieldNameDict.Clear();
-			//FieldDict.Clear();
 			reader.Close();
 			return true;
 		}
@@ -210,7 +214,7 @@ namespace SharpBladeFlightAnalyzer
 			defstr = defstr.Substring(msgNameLen + 1);
 			string[] fieldNames = defstr.Split(';');
 
-			List<Tuple<string, string>> fieldList = new List<Tuple<string, string>>();
+			List<Tuple<string, DataField>> fieldList = new List<Tuple<string, DataField>>();
 			string tstr;
 			for (int i = 0; i < fieldNames.Length; i++)
 			{
@@ -218,26 +222,29 @@ namespace SharpBladeFlightAnalyzer
 					continue;
 				string[] field = fieldNames[i].Split(' ');
 				if (field[0].IndexOf('[') > 0)
-				{
-					//string realType = field[0].Substring(0, field[0].IndexOf('['));
-					//string lens = field[0].Substring(field[0].IndexOf('[') + 1);
-					//lens = lens.Substring(0, field[0].IndexOf(']'));
+				{					
 					string realType = field[0];
 					int len = getArrayLength(ref realType);
 					for (int j = 0; j < len; j++)
 					{
 						tstr = msgname + "." + field[1] + "[" + j.ToString() + "]";
-						fieldList.Add(new Tuple<string, string>(realType, tstr));
-						//if (tstr.IndexOf("._padding") < 0 && tstr.IndexOf("timestamp") < 0)
-						//	FieldDict.Add(tstr, new DataField(tstr));
+						if (tstr.IndexOf("._padding") >= 0)
+							fieldList.Add(new Tuple<string, DataField>(realType, new DataField(tstr,SpecialField.Padding)));
+						else if (tstr.IndexOf("timestamp") >= 0)
+							fieldList.Add(new Tuple<string, DataField>(realType, new DataField(tstr,SpecialField.TimeStamp)));
+						else
+							fieldList.Add(new Tuple<string, DataField>(realType, new DataField(tstr)));					
 					}
 				}
 				else
 				{
 					tstr = msgname + "." + field[1];
-					fieldList.Add(new Tuple<string, string>(field[0], tstr));
-					//if (tstr.IndexOf("._padding") < 0 && tstr.IndexOf("timestamp") < 0)
-					//	FieldDict.Add(tstr, new DataField(tstr));
+					if (tstr.IndexOf("._padding") >= 0)
+						fieldList.Add(new Tuple<string, DataField>(field[0], new DataField(tstr,SpecialField.Padding)));
+					else if (tstr.IndexOf("timestamp") >= 0)
+						fieldList.Add(new Tuple<string, DataField>(field[0], new DataField(tstr,SpecialField.TimeStamp)));
+					else
+						fieldList.Add(new Tuple<string, DataField>(field[0], new DataField(tstr)));				
 				}
 			}
 			fieldNameDict.Add(msgname, fieldList);
@@ -356,7 +363,7 @@ namespace SharpBladeFlightAnalyzer
 			byte mid = reader.ReadByte();
 			ushort id = reader.ReadUInt16();
 			string name = readASCIIString(msglen - 3);
-			msgNameDict.Add(id, name);
+			msgNameDict.Add(id, name);			
 			return true;
 		}
 
@@ -368,14 +375,12 @@ namespace SharpBladeFlightAnalyzer
 		}
 
 		private bool readLoggedData(ushort msglen)
-		{
-			List<string> names = new List<string>();
+		{		
 			List<double> values = new List<double>();
 			double ts=0;
 			ushort msgid = reader.ReadUInt16();
 			string msgname = msgNameDict[msgid];
-			List<Tuple<string, string>> fields = fieldNameDict[msgname];
-
+			List<Tuple<string, DataField>> fields = fieldNameDict[msgname];			
 			double value = 0;
 			int size = 0;
 			foreach(var v in fields)
@@ -421,27 +426,23 @@ namespace SharpBladeFlightAnalyzer
 					case "char":
 						value = reader.ReadByte();
 						break;
-				}
-				if (v.Item2.IndexOf("._padding") >= 0)
-					continue;
-				if (v.Item2.IndexOf("timestamp") >= 0)
+				}				
+			
+				if (v.Item2.Flag==SpecialField.TimeStamp)
 				{
-					ts = (value-timestamp)/1.0e6;
-					continue;
-				}
-				if (v.Item1 == "char")
-					continue;
-				names.Add(v.Item2);
+					ts = (value-timestamp)/1.0e6;					
+				}			
 				values.Add(value);
 			}
-			for (int i = 0; i < names.Count; i++)
+			for(int i=0,j=0;j< values.Count;i++)
 			{
-				if (!fieldDict.ContainsKey(names[i]))
+				if(fields[i].Item2.Flag==SpecialField.Padding)
 				{
-					fieldDict.Add(names[i], new DataField(names[i]));
+					continue;
 				}
-				FieldDict[names[i]].Data.Add(new Tuple<double, double>(ts, values[i]));
-			}
+				fields[i].Item2.Data.Add(new Tuple<double, double>(ts, values[j]));
+				j++;
+			}			
 			return true;
 		}
 
