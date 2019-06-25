@@ -21,11 +21,40 @@ namespace SharpBladeFlightAnalyzer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		LogPageControl currentPage;
+
+		FieldListWindow fieldListWindow;
+
 		public MainWindow()
 		{
 			InitializeComponent();
-			//ULogFile f = new ULogFile();
-			//f.Load("D:\\temp\\log.ulg",1024);
+			fieldListWindow = new FieldListWindow();
+
+			ULogFile f = new ULogFile();
+			f.Load("D:\\temp\\log.ulg",1024);
+			LogPageControl lpc = new LogPageControl(f);
+			testPage.Content = lpc;
+			currentPage = (LogPageControl)((TabPage)mainTabControl.Items[0]).Content;
+		}
+
+		private void addFieldBtn_Click(object sender, RoutedEventArgs e)
+		{
+			setFieldList();
+			fieldListWindow.Topmost = true;
+			fieldListWindow.Show();
+			fieldListWindow.Topmost = false;
+		}
+
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			fieldListWindow.needClose = true;
+			fieldListWindow.Close();
+		}
+
+		private void setFieldList()
+		{
+			fieldListWindow.fieldList.ItemsSource = currentPage.LogFile.DataFields;
+			
 		}
 	}
 }

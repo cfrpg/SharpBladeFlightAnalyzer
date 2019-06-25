@@ -19,9 +19,30 @@ namespace SharpBladeFlightAnalyzer
 	/// </summary>
 	public partial class FieldListWindow : Window
 	{
+		public bool needClose;
 		public FieldListWindow()
 		{
 			InitializeComponent();
+			needClose = false;
+		}
+
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			if (!needClose)
+			{
+				this.Hide();
+				e.Cancel = true;
+			}
+		}
+
+		private void okBtn_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void closeBtn_Click(object sender, RoutedEventArgs e)
+		{
+			this.Hide();
 		}
 	}
 }

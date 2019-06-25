@@ -58,63 +58,32 @@
                 </Grid>
             </TabItem>
             <TabItem Header="参数" Width="100" Height="30" >
-                <ListView>
+                <ListView x:Name="paramList" ItemsSource="{Binding}">
                     <ListView.View>
                         <GridView>
-                            <GridView.Columns>
-                                <GridViewColumn Header="Name" Width="200">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Value" Width="100">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Disc" Width="500">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                            </GridView.Columns>
+                            <GridViewColumn Header="参数" Width="150" DisplayMemberBinding="{Binding Item1}"/>
+                            <GridViewColumn Header="值" Width="150" DisplayMemberBinding="{Binding Item2}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
             </TabItem>
             <TabItem Header="消息" Width="100" Height="30">
-                <ListView>
+                <ListView x:Name="msgList" ItemsSource="{Binding}">
                     <ListView.View>
                         <GridView>
-                            <GridView.Columns>
-                                <GridViewColumn Header="Time" Width="150">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Level" Width="100">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Msg" Width="500">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                            </GridView.Columns>
+                            <GridViewColumn Header="等级" Width="150" DisplayMemberBinding="{Binding Level}"/>
+                            <GridViewColumn Header="时间" Width="150" DisplayMemberBinding="{Binding Time,StringFormat={}{0:HH:mm:ss.fff}}"/>
+                            <GridViewColumn Header="消息" Width="400" DisplayMemberBinding="{Binding Message}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem Header="属性" Width="100" Height="30">
+                <ListView x:Name="propList" ItemsSource="{Binding}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="属性" Width="150" DisplayMemberBinding="{Binding Item1}"/>
+                            <GridViewColumn Header="值" Width="450" DisplayMemberBinding="{Binding Item2}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>

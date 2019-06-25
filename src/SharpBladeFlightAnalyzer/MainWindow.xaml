@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SharpBladeFlightAnalyzer"
         xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1000" MinHeight="700" MinWidth="1000">
+        Title="MainWindow" Height="700" Width="1000" MinHeight="700" MinWidth="1000" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">
@@ -64,6 +64,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" MinHeight="100"/>
+                <RowDefinition Height="20"/>
                 <RowDefinition Height="3"/>
                 <RowDefinition Height="1*" MinHeight="100"/>                
             </Grid.RowDefinitions>
@@ -89,8 +90,9 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-            <GridSplitter  Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="LightGray"/>
-            <Grid Grid.Row="2" Background="#FFF0F0F0">
+            <Button x:Name="addFieldBtn" Grid.Row="1" Content="添加" Click="addFieldBtn_Click"/>
+            <GridSplitter  Grid.Row="2" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="LightGray"/>
+            <Grid Grid.Row="3" Background="#FFF0F0F0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
@@ -120,9 +122,9 @@
         </Grid>
 
         <GridSplitter x:Name="gridSplitter" Grid.Column="1" Width="3" HorizontalAlignment="Center" Background="LightGray"/>
-        <TabControl Grid.Column="2">
-            <local:TabPage Header="23_33_33.ulg">
-                <local:LogPageControl/>
+        <TabControl x:Name="mainTabControl" Grid.Column="2">
+            <local:TabPage Header="23_33_33.ulg" x:Name="testPage">
+                
             </local:TabPage>
             <local:TabPage Header="New" CloseEnabled="False">
                 <Grid>

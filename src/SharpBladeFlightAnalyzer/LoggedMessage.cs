@@ -11,6 +11,7 @@ namespace SharpBladeFlightAnalyzer
 		LogLevel level;
 		ulong timestamp;
 		string message;
+		DateTime time;
 
 		public LogLevel Level
 		{
@@ -21,13 +22,22 @@ namespace SharpBladeFlightAnalyzer
 		public ulong Timestamp
 		{
 			get { return timestamp; }
-			set { timestamp = value; }
+			set
+			{
+				timestamp = value;
+				time = ULogFile.UnixStartTime.AddMilliseconds(timestamp / 1000);
+			}
 		}
 
 		public string Message
 		{
 			get { return message; }
 			set { message = value; }
+		}
+
+		public DateTime Time
+		{
+			get { return time; }
 		}
 	}
 

@@ -5,23 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SharpBladeFlightAnalyzer"
         mc:Ignorable="d"
-        Title="FieldListWindow" Height="500" Width="500">
+        Title="FieldListWindow" Height="500" Width="500" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="30"/>            
         </Grid.RowDefinitions>
-        <ListView>
+        <ListView x:Name="fieldList" ItemsSource="{Binding}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" Width="200"/>
-                    <GridViewColumn Header="Disc" Width="290"/>                    
+                    <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Disc" Width="200" DisplayMemberBinding="{Binding Description}"/>
+                    <GridViewColumn Header="Size" Width="50" DisplayMemberBinding="{Binding Data.Count}"/>
                 </GridView>
             </ListView.View>
         </ListView>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
-            <Button Content="确定" Width="75" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"/>
-            <Button Content="关闭" Width="75" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"/>
+            <Button x:Name="okBtn" Content="确定" Width="75" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0" Click="okBtn_Click"/>
+            <Button x:Name="closeBtn" Content="关闭" Width="75" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0" Click="closeBtn_Click"/>
         </StackPanel>
     </Grid>
 </Window>

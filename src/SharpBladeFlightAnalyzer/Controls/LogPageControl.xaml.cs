@@ -20,9 +20,20 @@ namespace SharpBladeFlightAnalyzer
 	/// </summary>
 	public partial class LogPageControl : UserControl
 	{
-		public LogPageControl()
+		ULogFile logFile;
+		public LogPageControl(ULogFile uf)
 		{
 			InitializeComponent();
+			logFile = uf;
+			paramList.ItemsSource = logFile.Parameters;
+			msgList.ItemsSource = logFile.Messages;
+			propList.ItemsSource = logFile.Infomations;
+		}
+
+		public ULogFile LogFile
+		{
+			get { return logFile; }
+			set { logFile = value; }
 		}
 	}
 }
