@@ -139,7 +139,7 @@ namespace SharpBladeFlightAnalyzer
 			{
 				foreach (var v1 in v.Value)
 				{
-					if (v1.Item2.Flag == SpecialField.None && v1.Item2.Data.Count != 0)
+					if (v1.Item2.Flag == SpecialField.None && v1.Item2.Values.Count != 0)
 					{
 						fieldDict.Add(v1.Item2.Name, v1.Item2);
 						dataFields.Add(v1.Item2);
@@ -434,14 +434,11 @@ namespace SharpBladeFlightAnalyzer
 				}			
 				values.Add(value);
 			}
-			for(int i=0,j=0;j< values.Count;i++)
+			for(int i=0;i< values.Count;i++)
 			{
-				if(fields[i].Item2.Flag==SpecialField.Padding)
-				{
-					continue;
-				}
-				fields[i].Item2.Data.Add(new Tuple<double, double>(ts, values[j]));
-				j++;
+				//fields[i].Item2.Data.Add(new Tuple<double, double>(ts, values[i]));
+				fields[i].Item2.Timestamps.Add(ts);
+				fields[i].Item2.Values.Add(values[i]);
 			}			
 			return true;
 		}

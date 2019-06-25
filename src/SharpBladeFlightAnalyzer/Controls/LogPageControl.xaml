@@ -16,44 +16,13 @@
                         <ColumnDefinition Width="3"/>
                         <ColumnDefinition Width="1*" MinWidth="100" MaxWidth="300"/>
                     </Grid.ColumnDefinitions>
-                    <!--<d3:Chart Margin="0,5,5,0">
+                    <d3:Chart Margin="0,5,5,0">
+                        <Grid x:Name="Lines"/>
+                    </d3:Chart>
 
-                    </d3:Chart>-->
-                    
                     <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center" Background="LightGray"/>
                     <ListView Grid.Column="2" HorizontalContentAlignment="Stretch">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Height="100">
-                                    <TextBlock Text="123456"/>
-                                    <d3:Chart Height="100">
-
-                                    </d3:Chart>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListViewItem Height="200" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                            <Canvas>
-                                <d3:Chart Width="180" Height="180">
-
-                                </d3:Chart>
-                            </Canvas>
-                        </ListViewItem>
-                        <ListViewItem Height="200" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                            <d3:Chart >
-
-                            </d3:Chart>
-                        </ListViewItem>
-                        <ListViewItem Height="200" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                            <d3:Chart >
-
-                            </d3:Chart>
-                        </ListViewItem>
+                      
                     </ListView>
                 </Grid>
             </TabItem>

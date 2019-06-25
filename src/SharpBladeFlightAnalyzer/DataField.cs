@@ -12,7 +12,10 @@ namespace SharpBladeFlightAnalyzer
 		string description;
 		SpecialField flag;
 		
-		List<Tuple<double, double>> data;
+		//List<Tuple<double, double>> data;
+
+		List<double> timestamps;
+		List<double> values;
 
 		public string Name
 		{
@@ -20,11 +23,11 @@ namespace SharpBladeFlightAnalyzer
 			set { name = value; }
 		}
 
-		public List<Tuple<double, double>> Data
-		{
-			get { return data; }
-			set { data = value; }
-		}
+		//public List<Tuple<double, double>> Data
+		//{
+		//	get { return data; }
+		//	set { data = value; }
+		//}
 
 		public string Description
 		{
@@ -38,17 +41,29 @@ namespace SharpBladeFlightAnalyzer
 			set { flag = value; }
 		}
 
-		public DataField(string n)
+		public List<double> Timestamps
 		{
-			name = n;
-			data = new List<Tuple<double, double>>();
-			flag = SpecialField.None;
+			get { return timestamps; }
+			set { timestamps = value; }
+		}
+
+		public List<double> Values
+		{
+			get { return values; }
+			set { values = value; }
+		}
+
+		public DataField(string n):this(n,SpecialField.None)
+		{
+			
 		}
 
 		public DataField(string n,SpecialField sf)
 		{
 			name = n;
-			data = new List<Tuple<double, double>>();
+			//data = new List<Tuple<double, double>>();
+			timestamps = new List<double>();
+			values = new List<double>();
 			flag = sf;
 		}
 	}
