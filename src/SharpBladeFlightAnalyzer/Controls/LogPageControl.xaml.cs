@@ -70,13 +70,28 @@ namespace SharpBladeFlightAnalyzer
 
 		public void AddLine(DataField df)
 		{
-			currentGraph.Polars.Add(new Polar(df, Colors.Red));
+			Polar p = new Polar(df, randomColor());
+			p.OnPolarChanged += OnPolarChanged;
+			currentGraph.Polars.Add(p);
 			refreshGraph();
 			update = true;
 			//var t = Task.Run(async delegate { await Task.Delay(100); currentGraph.TakeSnapShot(mainChart); });
 			//currentGraph.TakeSnapShot(mainChart);
 			Dispatcher.BeginInvoke(new Action(() => currentGraph.TakeSnapShot(mainChart)), System.Windows.Threading.DispatcherPriority.ContextIdle, null);
 		}
+
+		private void OnPolarChanged()
+		{
+			refreshGraph();
+			Dispatcher.BeginInvoke(new Action(() => currentGraph.TakeSnapShot(mainChart)), System.Windows.Threading.DispatcherPriority.ContextIdle, null);
+		}
+
+		private Color randomColor()
+		{
+			Random r = new Random();
+			return Color.FromRgb((byte)r.Next(256), (byte)r.Next(256), (byte)r.Next(256));
+		}
+
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
 			
@@ -84,16 +99,17 @@ namespace SharpBladeFlightAnalyzer
 
 		private void newGraphBtn_Click(object sender, RoutedEventArgs e)
 		{
-			Graph g = new Graph();
-			g.TakeSnapShot(mainChart);
+			Graph g = new Graph();			
 			graphs.Insert(graphs.Count - 1, g);
 			graphList.SelectedIndex = graphs.Count - 2;
 			setCurrentGraph(g);
+			Dispatcher.BeginInvoke(new Action(() => currentGraph.TakeSnapShot(mainChart)), System.Windows.Threading.DispatcherPriority.ContextIdle, null);
 		}
 
 		private void closeGraphBtn_Click(object sender, RoutedEventArgs e)
 		{
 			Graph g = (Graph)graphList.SelectedItem;
+			
 			graphs.Remove(g);
 		}
 
@@ -101,15 +117,21 @@ namespace SharpBladeFlightAnalyzer
 		{
 			currentGraph = g;
 			refreshGraph();
+			if (currentGraph == null)
+				polarListView.ItemsSource = null;
+			else
+				polarListView.ItemsSource = currentGraph.Polars;
 		}
 
 		private void refreshGraph()
 		{
 			Lines.Children.Clear();
-			foreach (var v in currentGraph.Polars)
-			{				
-				Lines.Children.Add(v.Line);
-			}			
+			if(currentGraph!=null)
+				foreach (var v in currentGraph.Polars)
+				{				
+					if(v.Visible)
+						Lines.Children.Add(v.Line);
+				}			
 		}
 
 		private void graphList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -123,6 +145,26 @@ namespace SharpBladeFlightAnalyzer
 		private void mainChart_LayoutUpdated(object sender, EventArgs e)
 		{
 			
+		}
+
+		private void addFieldBtn_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void polarListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			polarGrid.DataContext = polarListView.SelectedItem;
+		}
+
+		private void colorBtn_Click(object sender, RoutedEventArgs e)
+		{
+			System.Windows.Forms.ColorDialog cd = new System.Windows.Forms.ColorDialog();
+			if (cd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+			{
+				System.Drawing.Color c = cd.Color;
+				((Polar)polarListView.SelectedItem).Color= Color.FromArgb(c.A, c.R, c.G, c.B);
+			}
 		}
 	}
 }

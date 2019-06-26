@@ -34,8 +34,17 @@ namespace SharpBladeFlightAnalyzer
 			ULogFile f = new ULogFile();
 			f.Load("D:\\temp\\log.ulg", 1024);
 			LogPageControl lpc = new LogPageControl(f, this);
+			lpc.addFieldBtn.Click += AddFieldBtn_Click;
 			testPage.Content = lpc;
 			currentPage = (LogPageControl)((TabPage)mainTabControl.Items[0]).Content;
+		}
+
+		private void AddFieldBtn_Click(object sender, RoutedEventArgs e)
+		{
+			setFieldList();
+			fieldListWindow.Topmost = true;
+			fieldListWindow.Show();
+			fieldListWindow.Topmost = false;
 		}
 
 		private void OkBtn_Click(object sender, RoutedEventArgs e)
@@ -44,15 +53,7 @@ namespace SharpBladeFlightAnalyzer
 			{
 				currentPage.AddLine((DataField)fieldListWindow.fieldList.SelectedItem);
 			}
-		}
-
-		private void addFieldBtn_Click(object sender, RoutedEventArgs e)
-		{
-			setFieldList();
-			fieldListWindow.Topmost = true;
-			fieldListWindow.Show();
-			fieldListWindow.Topmost = false;
-		}
+		}		
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{

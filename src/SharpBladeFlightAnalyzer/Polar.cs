@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Media;
 using InteractiveDataDisplay.WPF;
 
@@ -12,6 +13,8 @@ namespace SharpBladeFlightAnalyzer
 	public class Polar : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
+		public delegate void PolarChanged();
+		public event PolarChanged OnPolarChanged;
 
 		double xOffset;
 		double yOffset;
@@ -21,6 +24,7 @@ namespace SharpBladeFlightAnalyzer
 		Color color;
 		LineGraph line;
 		DataField rawData;
+		bool visible;
 
 		double[] xValues;
 		double[] yValues;
@@ -31,7 +35,9 @@ namespace SharpBladeFlightAnalyzer
 			set
 			{
 				xOffset = value;
+				RefreshPolar();
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("XOffset"));
+				OnPolarChanged?.Invoke();
 			}
 		}
 
@@ -41,7 +47,9 @@ namespace SharpBladeFlightAnalyzer
 			set
 			{
 				yOffset = value;
+				RefreshPolar();
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("YOffset"));
+				OnPolarChanged?.Invoke();
 			}
 		}
 
@@ -51,7 +59,9 @@ namespace SharpBladeFlightAnalyzer
 			set
 			{
 				scale = value;
+				RefreshPolar();
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Scale"));
+				OnPolarChanged?.Invoke();
 			}
 		}
 
@@ -65,7 +75,9 @@ namespace SharpBladeFlightAnalyzer
 					lpf = 0;
 				if (lpf > 1)
 					lpf = 1;
+				RefreshPolar();
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Lpf"));
+				OnPolarChanged?.Invoke();
 			}
 		}
 
@@ -76,6 +88,7 @@ namespace SharpBladeFlightAnalyzer
 			{
 				name = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
+				OnPolarChanged?.Invoke();
 			}
 		}
 
@@ -87,6 +100,7 @@ namespace SharpBladeFlightAnalyzer
 				color = value;
 				line.Stroke = new SolidColorBrush(color);
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Color"));
+				OnPolarChanged?.Invoke();
 			}
 		}
 
@@ -96,35 +110,22 @@ namespace SharpBladeFlightAnalyzer
 			set { line = value; }
 		}
 
-		public double[] XValues
+		public bool Visible
 		{
-			get
-			{
-				return xValues;
-			}
-
+			get { return visible; }
 			set
 			{
-				xValues = value;
-			}
-		}
-
-		public double[] YValues
-		{
-			get
-			{
-				return yValues;
-			}
-
-			set
-			{
-				yValues = value;
+				visible = value;
+				line.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Color"));
+				OnPolarChanged?.Invoke();
 			}
 		}
 
 		public Polar(DataField d, Color c)
 		{
 			line = new LineGraph();
+			visible = true;
 			rawData = d;
 			XOffset = 0;
 			YOffset = 0;
@@ -138,15 +139,15 @@ namespace SharpBladeFlightAnalyzer
 
 		public void RefreshPolar()
 		{
-			XValues = rawData.Timestamps.Select(v => v + xOffset).ToArray();
-			if (YValues == null)
-				YValues = new double[rawData.Values.Count];
-			YValues[0] = (rawData.Values[0] + yOffset) * scale;
-			for (int i = 1; i < YValues.Length; i++)
+			xValues = rawData.Timestamps.Select(v => v + xOffset).ToArray();
+			if (yValues == null)
+				yValues = new double[rawData.Values.Count];
+			yValues[0] = (rawData.Values[0] + yOffset) * scale;
+			for (int i = 1; i < yValues.Length; i++)
 			{
-				YValues[i] = lpf * YValues[i - 1] + (1 - lpf) * (rawData.Values[i] + yOffset) * scale;
+				yValues[i] = lpf * yValues[i - 1] + (1 - lpf) * (rawData.Values[i] + yOffset) * scale;
 			}
-			line.Plot(XValues, YValues);
+			line.Plot(xValues, yValues);
 		}
 	}
 }

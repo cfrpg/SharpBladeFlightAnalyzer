@@ -6,8 +6,9 @@
              xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
              xmlns:local="clr-namespace:SharpBladeFlightAnalyzer"
              mc:Ignorable="d" 
-             d:DesignHeight="670" d:DesignWidth="790" Loaded="UserControl_Loaded">
+             d:DesignHeight="670" d:DesignWidth="990" Loaded="UserControl_Loaded">
     <UserControl.Resources>
+        <local:ColorBrushConvert x:Key="color2brush"/>
         <Style x:Key="CloseButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="BorderBrush" Value="Black"></Setter>
             <Setter Property="Background" Value="LightGray"></Setter>
@@ -77,83 +78,154 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <SolidColorBrush x:Key="Item.MouseOver.Background" Color="#1F26A0DA"/>
-        <SolidColorBrush x:Key="Item.MouseOver.Border" Color="#a826A0Da"/>
-        <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="#3DDADADA"/>
-        <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="#FFDADADA"/>
-        <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#3D26A0DA"/>
-        <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#FF26A0DA"/>
-        <Style TargetType="{x:Type ListViewItem}">
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="Padding" Value="4,1"/>
-            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ListViewItem}">
-                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsMouseOver" Value="True"/>
-                                </MultiTrigger.Conditions>
-                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.MouseOver.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.MouseOver.Border}"/>
-                            </MultiTrigger>
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
-                                    <Condition Property="IsSelected" Value="True"/>
-                                </MultiTrigger.Conditions>
-                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
-                            </MultiTrigger>
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="Selector.IsSelectionActive" Value="True"/>
-                                    <Condition Property="IsSelected" Value="True"/>
-                                </MultiTrigger.Conditions>
-                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
-                            </MultiTrigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        
     </UserControl.Resources>
     <Grid>
         <TabControl TabStripPlacement="Bottom">
             <TabItem Header="数据" Width="100" Height="30">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" MinWidth="200" MaxWidth="500"/>
+                        <ColumnDefinition Width="3"/>
                         <ColumnDefinition Width="3*" />
                         <ColumnDefinition Width="3"/>
                         <ColumnDefinition Width="1*" MinWidth="100" MaxWidth="300"/>
                     </Grid.ColumnDefinitions>
-                    <Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*" MinHeight="100"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="3"/>
+                            <RowDefinition Height="1*" MinHeight="100"/>
+                        </Grid.RowDefinitions>
+                        <ListView x:Name="polarListView" Margin="1,1,0,0" SelectionChanged="polarListView_SelectionChanged">
+                            <ListView.View>
+                                <GridView >
+                                    <GridView.Columns>
+                                        <GridViewColumn  Width="30">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding Visible}"/>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn  Width="25">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Rectangle Width="10" Height="10" Fill="{Binding Color,Converter={StaticResource color2brush}}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Header="Name" Width="150" DisplayMemberBinding="{Binding Name}"/>
+                                        <!--<GridViewColumn Header="Name" Width="160">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>-->
+                                    </GridView.Columns>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <Button x:Name="addFieldBtn" Grid.Row="1" Content="添加" Click="addFieldBtn_Click"/>
+                        <GridSplitter  Grid.Row="2" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="LightGray"/>
+                        <Grid x:Name="polarGrid" Grid.Row="3" Background="#FFF0F0F0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="1*" MinWidth="100"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Text="Name" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Text="Offset" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding YOffset}" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="2" Text="Scale" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Scale}" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="3" Text="Delay" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding XOffset}" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="4" Text="LPF" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Lpf}" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="5" Text="Color" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <Button x:Name="colorBtn" Grid.Row="5" Grid.Column="1" Margin="5,7" Background="{Binding Color,Converter={StaticResource color2brush}}" Click="colorBtn_Click"/>
+                        </Grid>
+                    </Grid>
+                    <GridSplitter x:Name="gridSplitter" Grid.Column="1" Width="3" HorizontalAlignment="Center" Background="LightGray"/>
+                    <Border Grid.Column="2">
                         <d3:Chart x:Name="mainChart" IsAutoFitEnabled="True" Margin="0,5,5,0" LayoutUpdated="mainChart_LayoutUpdated" LegendVisibility="Hidden">
                             <Grid x:Name="Lines"/>
                         </d3:Chart>
                     </Border>
-                    <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center" Background="LightGray"/>
-                    <ListView x:Name="graphList" Grid.Column="2" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="graphList_SelectionChanged" >
+                    <GridSplitter Grid.Column="3" Width="3" HorizontalAlignment="Center" Background="LightGray"/>
+                    <ListView x:Name="graphList" Grid.Column="4" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="graphList_SelectionChanged" >
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel/>
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                         <ListBox.Resources>
+                            <SolidColorBrush x:Key="Item.MouseOver.Background" Color="#1F26A0DA"/>
+                            <SolidColorBrush x:Key="Item.MouseOver.Border" Color="#a826A0Da"/>
+                            <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="#3DDADADA"/>
+                            <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="#FFDADADA"/>
+                            <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#3D26A0DA"/>
+                            <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#FF26A0DA"/>
+                            <Style TargetType="{x:Type ListViewItem}">
+                                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                                <Setter Property="Padding" Value="4,1"/>
+                                <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                                <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                            <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsMouseOver" Value="True"/>
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.MouseOver.Background}"/>
+                                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.MouseOver.Border}"/>
+                                                </MultiTrigger>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                                        <Condition Property="IsSelected" Value="True"/>
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
+                                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
+                                                </MultiTrigger>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                                                        <Condition Property="IsSelected" Value="True"/>
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
+                                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
+                                                </MultiTrigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+
                             <DataTemplate DataType="{x:Type local:Graph}">
                                 <Grid>
                                     <Border  BorderBrush="Black" BorderThickness="1"/>
@@ -179,7 +251,7 @@
                 <ListView x:Name="paramList" ItemsSource="{Binding}">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="参数" Width="150" DisplayMemberBinding="{Binding Item1}"/>
+                            <GridViewColumn Header="参数" Width="150" DisplayMemberBinding="{Binding Item2}"/>
                             <GridViewColumn Header="值" Width="150" DisplayMemberBinding="{Binding Item2}"/>
                         </GridView>
                     </ListView.View>

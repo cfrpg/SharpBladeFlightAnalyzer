@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Collections.ObjectModel;
 using InteractiveDataDisplay.WPF;
 
 namespace SharpBladeFlightAnalyzer
@@ -15,10 +16,10 @@ namespace SharpBladeFlightAnalyzer
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		List<Polar> polars;
+		ObservableCollection<Polar> polars;
 		RenderTargetBitmap thumb;
 
-		public List<Polar> Polars
+		public ObservableCollection<Polar> Polars
 		{
 			get { return polars; }
 			set { polars = value; }
@@ -36,7 +37,7 @@ namespace SharpBladeFlightAnalyzer
 
 		public Graph()
 		{
-			polars = new List<Polar>();			
+			polars = new ObservableCollection<Polar>();			
 		}
 
 		public void TakeSnapShot(FrameworkElement cam)

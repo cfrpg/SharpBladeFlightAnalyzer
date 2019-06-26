@@ -55,74 +55,7 @@
         </Style>
 
     </Window.Resources>
-    <Grid Background="Gray">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" MinWidth="200" MaxWidth="500"/>
-            <ColumnDefinition Width="3"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1*" MinHeight="100"/>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="3"/>
-                <RowDefinition Height="1*" MinHeight="100"/>                
-            </Grid.RowDefinitions>
-            <ListView x:Name="polarListView" Margin="1,1,0,0">
-                <ListView.View>
-                    <GridView >
-                        <GridView.Columns>
-                            <GridViewColumn  Width="30">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding LogEnabled}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>                                
-                            </GridViewColumn>
-                            <GridViewColumn Header="Name" Width="160">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Name}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView.Columns>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-            <Button x:Name="addFieldBtn" Grid.Row="1" Content="添加" Click="addFieldBtn_Click"/>
-            <GridSplitter  Grid.Row="2" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="LightGray"/>
-            <Grid Grid.Row="3" Background="#FFF0F0F0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="1*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70"/>
-                    <ColumnDefinition Width="1*" MinWidth="100"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Text="Name" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Text="123456" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="1" Text="Offset" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Text="123456" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="2" Text="Scale" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <TextBox Grid.Row="2" Grid.Column="1" Text="123456" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="3" Text="Delay" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <TextBox Grid.Row="3" Grid.Column="1" Text="123456" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="4" Text="LPF" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <TextBox Grid.Row="4" Grid.Column="1" Text="123456" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="5" Text="Color" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <TextBox Grid.Row="5" Grid.Column="1" Text="123456" BorderThickness="1" Margin="5" VerticalAlignment="Center"/>
-            </Grid>
-        </Grid>
-
-        <GridSplitter x:Name="gridSplitter" Grid.Column="1" Width="3" HorizontalAlignment="Center" Background="LightGray"/>
-        
+    <Grid Background="Gray"> 
         <TabControl x:Name="mainTabControl" Grid.Column="2">
             <local:TabPage Header="23_33_33.ulg" x:Name="testPage">
                 

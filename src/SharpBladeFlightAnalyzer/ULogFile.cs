@@ -363,7 +363,23 @@ namespace SharpBladeFlightAnalyzer
 			byte mid = reader.ReadByte();
 			ushort id = reader.ReadUInt16();
 			string name = readASCIIString(msglen - 3);
-			msgNameDict.Add(id, name);			
+			if (mid == 0)
+			{
+				msgNameDict.Add(id, name);
+			}
+			else
+			{
+				string newMsgName = name + "_" + mid.ToString();
+				msgNameDict.Add(id, newMsgName);
+				List<Tuple<string, DataField>> old = fieldNameDict[name];
+				List<Tuple<string, DataField>> newfield = new List<Tuple<string, DataField>>();
+				for(int i=0;i<old.Count;i++)
+				{
+					DataField f = new DataField(old[i].Item2.Name.Insert(name.Length, "_" + mid.ToString()), old[i].Item2.Flag);
+					newfield.Add(new Tuple<string, DataField>(old[i].Item1, f));
+				}
+				fieldNameDict.Add(newMsgName, newfield);
+			}			
 			return true;
 		}
 
