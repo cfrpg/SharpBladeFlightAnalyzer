@@ -16,7 +16,7 @@
                 <GridView>
                     <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
                     <GridViewColumn Header="Disc" Width="200" DisplayMemberBinding="{Binding Description}"/>
-                    <GridViewColumn Header="Size" Width="50" DisplayMemberBinding="{Binding Data.Count}"/>
+                    <GridViewColumn Header="Size" Width="50" DisplayMemberBinding="{Binding Values.Count}"/>
                 </GridView>
             </ListView.View>
         </ListView>

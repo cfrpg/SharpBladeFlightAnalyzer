@@ -96,13 +96,39 @@ namespace SharpBladeFlightAnalyzer
 			set { line = value; }
 		}
 
+		public double[] XValues
+		{
+			get
+			{
+				return xValues;
+			}
+
+			set
+			{
+				xValues = value;
+			}
+		}
+
+		public double[] YValues
+		{
+			get
+			{
+				return yValues;
+			}
+
+			set
+			{
+				yValues = value;
+			}
+		}
+
 		public Polar(DataField d, Color c)
 		{
 			line = new LineGraph();
 			rawData = d;
 			XOffset = 0;
 			YOffset = 0;
-			Scale = 0;
+			Scale = 1;
 			Lpf = 0;
 			Name = d.Name;
 			Color = c;
@@ -112,15 +138,15 @@ namespace SharpBladeFlightAnalyzer
 
 		public void RefreshPolar()
 		{
-			xValues = rawData.Timestamps.Select(v => v + xOffset).ToArray();
-			if (yValues == null)
-				yValues = new double[rawData.Values.Count];
-			yValues[0] = (rawData.Values[0] + yOffset) * scale;
-			for (int i = 1; i < yValues.Length; i++)
+			XValues = rawData.Timestamps.Select(v => v + xOffset).ToArray();
+			if (YValues == null)
+				YValues = new double[rawData.Values.Count];
+			YValues[0] = (rawData.Values[0] + yOffset) * scale;
+			for (int i = 1; i < YValues.Length; i++)
 			{
-				yValues[i] = lpf * yValues[i - 1] + (1 - lpf) * (rawData.Values[0] + yOffset) * scale;
+				YValues[i] = lpf * YValues[i - 1] + (1 - lpf) * (rawData.Values[i] + yOffset) * scale;
 			}
-			line.Plot(xValues, yValues);
+			line.Plot(XValues, YValues);
 		}
 	}
 }

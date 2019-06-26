@@ -33,14 +33,17 @@ namespace SharpBladeFlightAnalyzer
 
 			ULogFile f = new ULogFile();
 			f.Load("D:\\temp\\log.ulg", 1024);
-			LogPageControl lpc = new LogPageControl(f);
+			LogPageControl lpc = new LogPageControl(f, this);
 			testPage.Content = lpc;
 			currentPage = (LogPageControl)((TabPage)mainTabControl.Items[0]).Content;
 		}
 
 		private void OkBtn_Click(object sender, RoutedEventArgs e)
 		{
-			
+			if(fieldListWindow.fieldList.SelectedItem!=null)
+			{
+				currentPage.AddLine((DataField)fieldListWindow.fieldList.SelectedItem);
+			}
 		}
 
 		private void addFieldBtn_Click(object sender, RoutedEventArgs e)
