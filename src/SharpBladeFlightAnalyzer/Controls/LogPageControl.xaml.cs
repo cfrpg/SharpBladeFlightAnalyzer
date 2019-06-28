@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
+using System.IO;
 
 
 namespace SharpBladeFlightAnalyzer
@@ -29,9 +30,7 @@ namespace SharpBladeFlightAnalyzer
 
 		ObservableCollection<Graph> graphs;
 
-		Graph currentGraph;
-
-		bool update;
+		Graph currentGraph;		
 
 		public ULogFile LogFile
 		{
@@ -59,8 +58,13 @@ namespace SharpBladeFlightAnalyzer
 
 			mainWindow = w;
 
-			update = false;
-			
+			Graph g = new Graph();
+			graphs.Insert(graphs.Count - 1, g);
+			graphList.SelectedIndex = graphs.Count - 2;
+			setCurrentGraph(g);
+			Dispatcher.BeginInvoke(new Action(() => currentGraph.TakeSnapShot(mainChart)), System.Windows.Threading.DispatcherPriority.ContextIdle, null);
+
+
 		}
 		
 		public void AddLine(string name)
@@ -70,14 +74,12 @@ namespace SharpBladeFlightAnalyzer
 
 		public void AddLine(DataField df)
 		{
+			if (currentGraph == null)
+				return;
 			Polar p = new Polar(df, randomColor());
 			p.OnPolarChanged += OnPolarChanged;
 			currentGraph.Polars.Add(p);
-			refreshGraph();
-			update = true;
-			//var t = Task.Run(async delegate { await Task.Delay(100); currentGraph.TakeSnapShot(mainChart); });
-			//currentGraph.TakeSnapShot(mainChart);
-			Dispatcher.BeginInvoke(new Action(() => currentGraph.TakeSnapShot(mainChart)), System.Windows.Threading.DispatcherPriority.ContextIdle, null);
+			OnPolarChanged();
 		}
 
 		private void OnPolarChanged()
@@ -165,6 +167,39 @@ namespace SharpBladeFlightAnalyzer
 				System.Drawing.Color c = cd.Color;
 				((Polar)polarListView.SelectedItem).Color= Color.FromArgb(c.A, c.R, c.G, c.B);
 			}
+		}
+
+		private void removeFieldBtn_Click(object sender, RoutedEventArgs e)
+		{
+			if (polarListView.SelectedItem == null)
+				return;
+			Polar p = (Polar)polarListView.SelectedItem;
+			currentGraph.Polars.Remove(p);
+			OnPolarChanged();
+		}
+
+		private void exportFieldBtn_Click(object sender, RoutedEventArgs e)
+		{
+			if (polarListView.SelectedItem == null)
+				return;
+			System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+			sfd.AddExtension = true;
+			sfd.Filter = "csv files(*.csv)|*.csv";			
+			if(sfd.ShowDialog()== System.Windows.Forms.DialogResult.OK)
+			{
+				Polar p = (Polar)polarListView.SelectedItem;
+				StreamWriter sw = new StreamWriter(sfd.FileName, false);
+				sw.WriteLine("Figure,,Raw,,");
+				sw.WriteLine("{0},{1},{2},{3},", "Time", p.Name, "Time", p.Name);
+				for(int i=0;i<p.RawData.Values.Count;i++)
+				{
+					sw.WriteLine("{0},{1},{2},{3},", p.XValues[i], p.YValues[i], p.RawData.Timestamps[i], p.RawData.Values[i]);
+				}
+				sw.Close();
+				
+			}
+			
+
 		}
 	}
 }

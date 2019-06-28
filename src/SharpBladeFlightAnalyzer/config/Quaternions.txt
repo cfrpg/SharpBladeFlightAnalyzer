@@ -1,0 +1,11 @@
+vehicle_attitude.q vehicle_attitude
+//vehicle_attitude.delta_q_reset vehicle_attitude.delta_reset
+vehicle_attitude_setpoint.q_d vehicle_attitude_setpoint_d
+fw_virtual_attitude_setpoint.q_d fw_virtual_attitude_setpoint_d
+camera_capture.q camera_capture
+vehicle_vision_attitude.q vehicle_vision_attitude
+//vehicle_vision_attitude.delta_q_reset vehicle_vision_attitude.delta_reset
+att_pos_mocap.q att_pos_mocap
+vehicle_attitude_groundtruth.q vehicle_attitude_groundtruth
+//vehicle_attitude_groundtruth.delta_q_reset vehicle_attitude_groundtruth.delta_reset
+mc_virtual_attitude_setpoint.q_d mc_virtual_attitude_setpoint_d

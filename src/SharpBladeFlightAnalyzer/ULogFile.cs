@@ -17,9 +17,10 @@ namespace SharpBladeFlightAnalyzer
 		byte version;
 
 		BinaryReader reader;
-		int section;
 
 		ulong[] appendedOffset;
+
+		FileInfo file;
 
 		//ID,msgName
 		Dictionary<ushort, string> msgNameDict;
@@ -99,6 +100,11 @@ namespace SharpBladeFlightAnalyzer
 			set { fieldDict = value; }
 		}
 
+		public FileInfo File
+		{
+			get { return file; }
+		}
+
 		public ULogFile()
 		{
 			appendedOffset = new UInt64[3] { 0, 0, 0 };
@@ -111,9 +117,9 @@ namespace SharpBladeFlightAnalyzer
 			dataFields = new List<DataField>();			
 		}
 
-		public bool Load(string path, int buffsize)
+		public bool Load(string path, Dictionary<string, FieldConfig> fieldConfigs)
 		{
-			FileInfo fi = new FileInfo(path);
+			file = new FileInfo(path);
 			reader = new BinaryReader(new FileStream(path, FileMode.Open));
 			byte[] buff = reader.ReadBytes(8);
 			if (buff[0] != 0x55)
@@ -132,7 +138,6 @@ namespace SharpBladeFlightAnalyzer
 				return false;
 			version = buff[7];
 			timestamp = reader.ReadUInt64();
-			section = 0;
 			while (readMessage()) ;
 			fieldDict.Clear();
 			foreach(var v in fieldNameDict)
@@ -145,10 +150,66 @@ namespace SharpBladeFlightAnalyzer
 						dataFields.Add(v1.Item2);
 					}
 				}
-			}			
+			}
 			msgNameDict.Clear();
 			fieldNameDict.Clear();
 			reader.Close();
+
+			FileInfo fi = new FileInfo(Environment.CurrentDirectory + "\\config\\Quaternions.txt");
+			if(fi.Exists)
+			{
+				StreamReader sr = new StreamReader(Environment.CurrentDirectory + "\\config\\Quaternions.txt");
+				while(!sr.EndOfStream)
+				{
+					string line = sr.ReadLine();
+					if (line[0] == '/' && line[1] == '/')
+						continue;
+					string[] strs = line.Split(' ');
+					if(strs.Length==2)
+					{
+						processQuaternion(strs[0], strs[1]);
+					}
+				}
+				sr.Close();
+			}
+
+			dataFields.Sort((a,b)=>
+			{
+				int ai = a.Name.IndexOf("[");
+				int bi = b.Name.IndexOf("[");
+				if (ai > 0 && bi > 0)
+				{
+					string an = a.Name.Substring(0, ai);
+					string bn = b.Name.Substring(0, bi);
+					if (an == bn)
+					{
+						an = a.Name.Substring(ai + 1);
+						bn = b.Name.Substring(bi + 1);
+						an = an.Substring(0, an.Length - 1);
+						bn = bn.Substring(0, bn.Length - 1);
+						return int.Parse(an).CompareTo(int.Parse(bn));
+					}
+				}
+				return a.Name.CompareTo(b.Name);
+			});
+
+			for(int i=0;i<dataFields.Count;i++)
+			{
+				if (fieldConfigs.ContainsKey(dataFields[i].Name))
+				{
+					FieldConfig fc = fieldConfigs[dataFields[i].Name];
+					if (fc.ShortName != "")
+						dataFields[i].DispName = fc.ShortName;
+					if (fc.Description != "")
+						dataFields[i].Description = fc.Description;
+					if(!fc.Enable)
+					{
+						dataFields.RemoveAt(i);
+						i--;
+					}
+				}
+				
+			}
 			return true;
 		}
 
@@ -494,6 +555,41 @@ namespace SharpBladeFlightAnalyzer
 			len = int.Parse(str);
 			name = name.Substring(0, pos);
 			return len;
+		}
+
+		private void processQuaternion(string name,string newname)
+		{
+			DataField[] quats = new DataField[4];
+			for(int i=0;i<4;i++)
+			{
+				string key = name + "[" + i.ToString() + "]";
+				if (!fieldDict.ContainsKey(key))
+					return;
+				quats[i] = fieldDict[key];
+			}
+			
+			DataField psi = new DataField(newname + ".yaw");
+			DataField theta = new DataField(newname + ".pitch");
+			DataField phi = new DataField(newname + ".roll");
+			for(int i=0;i<quats[0].Values.Count;i++)
+			{
+				double w = quats[0].Values[i];
+				double x = quats[1].Values[i];
+				double y = quats[2].Values[i];
+				double z = quats[3].Values[i];
+				phi.Values.Add(Math.Atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y)));
+				theta.Values.Add(Math.Asin(2 * (w * y - z * x)));
+				psi.Values.Add(Math.Atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)));
+				phi.Timestamps.Add(quats[0].Timestamps[i]);
+				theta.Timestamps.Add(quats[0].Timestamps[i]);
+				psi.Timestamps.Add(quats[0].Timestamps[i]);
+			}
+			fieldDict.Add(phi.Name, phi);
+			fieldDict.Add(theta.Name, theta);
+			fieldDict.Add(psi.Name, psi);
+			dataFields.Add(phi);
+			dataFields.Add(theta);
+			dataFields.Add(psi);
 		}
 
 	}

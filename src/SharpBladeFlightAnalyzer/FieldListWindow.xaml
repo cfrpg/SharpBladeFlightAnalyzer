@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SharpBladeFlightAnalyzer"
         mc:Ignorable="d"
-        Title="FieldListWindow" Height="500" Width="500" Closing="Window_Closing">
+        Title="数据列表" Height="500" Width="500" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -14,9 +14,9 @@
         <ListView x:Name="fieldList" ItemsSource="{Binding}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Disc" Width="200" DisplayMemberBinding="{Binding Description}"/>
-                    <GridViewColumn Header="Size" Width="50" DisplayMemberBinding="{Binding Values.Count}"/>
+                    <GridViewColumn Header="数据" Width="200" DisplayMemberBinding="{Binding DispName}"/>
+                    <GridViewColumn Header="描述" Width="200" DisplayMemberBinding="{Binding Description}"/>
+                    <GridViewColumn Header="数据量" Width="60" DisplayMemberBinding="{Binding Values.Count}"/>
                 </GridView>
             </ListView.View>
         </ListView>

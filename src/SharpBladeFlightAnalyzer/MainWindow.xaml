@@ -56,15 +56,16 @@
 
     </Window.Resources>
     <Grid Background="Gray"> 
-        <TabControl x:Name="mainTabControl" Grid.Column="2">
-            <local:TabPage Header="23_33_33.ulg" x:Name="testPage">
+        <TabControl x:Name="mainTabControl" Grid.Column="2" SelectionChanged="mainTabControl_SelectionChanged">
+            <!--<local:TabPage Header="23_33_33.ulg" x:Name="testPage">
                 
-            </local:TabPage>
-            <local:TabPage Header="New" CloseEnabled="False">
+            </local:TabPage>-->
+            <local:TabPage Header="新建" CloseEnabled="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="200"/>
+                        
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -74,7 +75,7 @@
                     </Grid.ColumnDefinitions>
                     <Rectangle Grid.Column="1" Grid.Row="1" Stroke="Gray" StrokeThickness="10" StrokeDashArray="3 1.55" RadiusX="20" RadiusY="20"/>
                     <Path Grid.Column="1" Grid.Row="1" Data="M100,60 100,140 M60,100 140,100" Stroke="Gray" StrokeThickness="10"/>
-                    <Button Grid.Column="1" Grid.Row="1" Background="Transparent" BorderBrush="Transparent" Foreground="Transparent" Style="{DynamicResource ButtonStyle1}"/>
+                    <Button Grid.Column="1" Grid.Row="1" Background="Transparent" BorderBrush="Transparent" Foreground="Transparent" Style="{DynamicResource ButtonStyle1}" Click="Button_Click"/>
                 </Grid>
             </local:TabPage>
 

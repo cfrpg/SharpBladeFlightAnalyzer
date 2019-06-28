@@ -9,6 +9,7 @@ namespace SharpBladeFlightAnalyzer
 	public class DataField
 	{
 		string name;
+		string dispName;
 		string description;
 		SpecialField flag;
 		
@@ -53,6 +54,12 @@ namespace SharpBladeFlightAnalyzer
 			set { values = value; }
 		}
 
+		public string DispName
+		{
+			get { return dispName; }
+			set { dispName = value; }
+		}
+
 		public DataField(string n):this(n,SpecialField.None)
 		{
 			
@@ -61,6 +68,7 @@ namespace SharpBladeFlightAnalyzer
 		public DataField(string n,SpecialField sf)
 		{
 			name = n;
+			dispName = n;
 			//data = new List<Tuple<double, double>>();
 			timestamps = new List<double>();
 			values = new List<double>();
