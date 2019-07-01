@@ -102,6 +102,7 @@ namespace SharpBladeFlightAnalyzer
 					page.Header = f.File.Name;
 
 					page.Content = lpc;
+					page.DisposableContent = f;
 					mainTabControl.Items.Insert(mainTabControl.Items.Count - 1, page);
 					mainTabControl.SelectedIndex = mainTabControl.Items.Count - 2;
 					currentPage = lpc;

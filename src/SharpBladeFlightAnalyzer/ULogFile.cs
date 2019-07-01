@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace SharpBladeFlightAnalyzer
 {
-	public class ULogFile
+	public class ULogFile :IDisposable
 	{
 		private static Dictionary<string, int> typeSize;
 		public static DateTime UnixStartTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -207,10 +207,16 @@ namespace SharpBladeFlightAnalyzer
 						dataFields.RemoveAt(i);
 						i--;
 					}
-				}
-				
-			}
+				}				
+			}			
 			return true;
+		}
+
+		public void Dispose()
+		{
+			dataFields.Clear();
+			fieldDict.Clear();
+			GC.Collect();
 		}
 
 		private string readASCIIString(int n)
@@ -308,7 +314,17 @@ namespace SharpBladeFlightAnalyzer
 						fieldList.Add(new Tuple<string, DataField>(field[0], new DataField(tstr)));				
 				}
 			}
-			fieldNameDict.Add(msgname, fieldList);
+			bool flag = true;
+			foreach(var v in fieldList)
+			{
+				if(!typeSize.ContainsKey(v.Item1))
+				{
+					flag = false;
+					break;
+				}
+			}
+			if(flag)
+				fieldNameDict.Add(msgname, fieldList);
 			return true;
 		}
 
@@ -424,6 +440,8 @@ namespace SharpBladeFlightAnalyzer
 			byte mid = reader.ReadByte();
 			ushort id = reader.ReadUInt16();
 			string name = readASCIIString(msglen - 3);
+			if (!fieldNameDict.ContainsKey(name))
+				return true;
 			if (mid == 0)
 			{
 				msgNameDict.Add(id, name);
@@ -456,6 +474,11 @@ namespace SharpBladeFlightAnalyzer
 			List<double> values = new List<double>();
 			double ts=0;
 			ushort msgid = reader.ReadUInt16();
+			if(!msgNameDict.ContainsKey(msgid))
+			{
+				reader.ReadBytes(msglen - 2);
+				return true;
+			}
 			string msgname = msgNameDict[msgid];
 			List<Tuple<string, DataField>> fields = fieldNameDict[msgname];			
 			double value = 0;

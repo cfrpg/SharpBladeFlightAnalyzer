@@ -23,6 +23,8 @@ namespace SharpBladeFlightAnalyzer
 		private TabControl parent;
 		private double defaultWidth = 150;
 
+		public IDisposable DisposableContent { get; set; }
+
 		public static readonly DependencyProperty CloseEnabledProperty =
 			DependencyProperty.Register("CloseEnabled", typeof(bool), typeof(TabPage), new PropertyMetadata(true, TabPage.OnCloseEnabledPropertyChanged));
 		public bool CloseEnabled
@@ -39,6 +41,7 @@ namespace SharpBladeFlightAnalyzer
 		{
 			setCloseBtn();
 		}
+
 
 		public TabPage()
 		{
@@ -131,6 +134,7 @@ namespace SharpBladeFlightAnalyzer
 			parent.SizeChanged -= Parent_SizeChanged;
 			parent.SelectionChanged -= Parent_SelectionChanged;
 			setWidth();
+			DisposableContent.Dispose();
 		}
 	}
 }
