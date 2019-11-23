@@ -113,9 +113,15 @@ namespace SharpBladeFlightAnalyzer
 		private void mainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (mainTabControl.SelectedIndex != mainTabControl.Items.Count - 1 && mainTabControl.SelectedIndex != -1)
+			{
 				currentPage = (LogPageControl)((TabPage)mainTabControl.SelectedItem).Content;
+				setFieldList();
+			}
 			else
+			{
 				currentPage = null;
+				fieldListWindow.fieldList.ItemsSource = null;
+			}
 		}
 	}
 }
