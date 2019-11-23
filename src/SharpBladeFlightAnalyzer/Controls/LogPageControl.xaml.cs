@@ -201,5 +201,49 @@ namespace SharpBladeFlightAnalyzer
 			
 
 		}
+
+		private void exportGraphBtn_Click(object sender, RoutedEventArgs e)
+		{
+			System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+			sfd.AddExtension = true;
+			sfd.Filter = "csv files(*.csv)|*.csv";
+			if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+			{
+				StreamWriter sw = new StreamWriter(sfd.FileName, false);
+				foreach (var p in currentGraph.Polars)
+				{
+					if(p.Visible)
+					{
+						sw.Write("Time,{0},", p.Name);
+					}
+				}
+				sw.WriteLine();
+				bool flag = true;
+				int cnt = 0;
+				while (flag)
+				{
+					flag = false;
+					foreach(var p in currentGraph.Polars)
+					{
+						if(p.Visible)
+						{
+							if(p.XValues.Length>cnt)
+							{
+								sw.Write("{0},{1},", p.XValues[cnt], p.YValues[cnt]);
+								flag = true;
+							}
+							else
+							{
+								sw.Write(",,");
+							}
+						}
+					}
+					cnt++;
+					sw.WriteLine();
+				}
+				sw.Close();
+
+			}
+		}
 	}
 }
