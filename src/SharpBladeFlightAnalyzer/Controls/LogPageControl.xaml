@@ -257,7 +257,7 @@
                 <ListView x:Name="paramList" ItemsSource="{Binding}">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="参数" Width="150" DisplayMemberBinding="{Binding Item2}"/>
+                            <GridViewColumn Header="参数" Width="150" DisplayMemberBinding="{Binding Item1}"/>
                             <GridViewColumn Header="值" Width="150" DisplayMemberBinding="{Binding Item2}"/>
                         </GridView>
                     </ListView.View>
