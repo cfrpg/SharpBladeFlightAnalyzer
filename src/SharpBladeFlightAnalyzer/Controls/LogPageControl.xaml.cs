@@ -245,5 +245,106 @@ namespace SharpBladeFlightAnalyzer
 
 			}
 		}
+
+		private void exportAcmiBtn_Click(object sender, RoutedEventArgs e)
+		{
+			if ((!logFile.FieldDict.ContainsKey("vehicle_global_position.lon")) ||
+				(!logFile.FieldDict.ContainsKey("vehicle_global_position.lat")) ||
+				(!logFile.FieldDict.ContainsKey("vehicle_global_position.alt")) ||
+				(!logFile.FieldDict.ContainsKey("vehicle_attitude.roll")) ||
+				(!logFile.FieldDict.ContainsKey("vehicle_attitude.pitch")) ||
+				(!logFile.FieldDict.ContainsKey("vehicle_attitude.yaw")))
+			{
+				MessageBox.Show("数据不全");
+				return;
+			}
+			DataField[] posData = new DataField[3];
+			DataField[] attData = new DataField[3];
+			posData[0] = logFile.FieldDict["vehicle_global_position.lon"];
+			posData[1] = logFile.FieldDict["vehicle_global_position.lat"];
+			posData[2] = logFile.FieldDict["vehicle_global_position.alt"];
+			attData[0] = logFile.FieldDict["vehicle_attitude.roll"];
+			attData[1] = logFile.FieldDict["vehicle_attitude.pitch"];
+			attData[2] = logFile.FieldDict["vehicle_attitude.yaw"];
+			double[] attFilter = new double[3];
+
+			System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+			sfd.AddExtension = true;
+			sfd.Filter = "acmi text files(*.acmi)|*.acmi";
+			if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+			{
+				StreamWriter sw = new StreamWriter(sfd.FileName, false);
+				sw.WriteLine("FileType=text/acmi/tacview");
+				sw.WriteLine("FileVersion=2.1");
+				sw.WriteLine("0,ReferenceTime=2020-09-01T05:00:00Z");
+				sw.WriteLine("101,Name=PX4,Type=Air+FixedWing");
+				double currtime = -1;
+				double time;
+				double hdg;
+				int pospos = 0, attpos = 0;
+				var posTimes = posData[0].Timestamps;
+				var attTimes = attData[0].Timestamps;
+				sw.WriteLine("#{0}",Math.Min(posTimes[0],attTimes[0]));
+				sw.WriteLine("101,T={0}|{1}|{2}", posData[0].Values[0], posData[1].Values[0], posData[2].Values[0]);
+				hdg = attData[2].Values[0] * 57.29577951;
+				while (pospos < posTimes.Count || attpos < attTimes.Count)
+				{
+					int flag = 0;
+					if(pospos < posTimes.Count && attpos < attTimes.Count)
+					{
+						if(posTimes[pospos]< attTimes[attpos])
+						{
+							flag = 1;
+						}
+						else
+						{
+							flag = 2;
+						}
+					}
+					else if(pospos < posTimes.Count)
+					{
+						flag = 1;
+					}
+					else
+					{
+						flag = 2;
+					}
+					if(flag==1)
+					{
+						//Update pos
+						sw.WriteLine("#" + posTimes[pospos].ToString());
+					
+						sw.WriteLine("101,T={0}|{1}|{2}|{3}|{4}|{5}", posData[0].Values[pospos], posData[1].Values[pospos], posData[2].Values[pospos], attFilter[0] * 57.29577951, attFilter[1] * 57.29577951, hdg);
+						pospos++;
+					}
+					else
+					{
+
+						for (int i = 0; i < 2; i++)
+						{
+							if (attpos == 0)
+								attFilter[i] = attData[i].Values[attpos];
+							else
+							{
+								attFilter[i] = 0.95 * attFilter[i] + 0.05 * attData[i].Values[attpos];
+							}
+						}
+						hdg = attData[2].Values[attpos] * 57.29577951;
+						if (hdg < 0)
+							hdg += 360;
+						//if (attTimes[attpos] - currtime >= 0.1)
+						//{
+						//	sw.WriteLine("#" + attTimes[attpos].ToString());
+
+						//	sw.WriteLine("101,T=|||{0}|{1}|{2}", attFilter[0] * 57.29577951, attFilter[1] * 57.29577951, hdg);
+						//	currtime = attTimes[attpos];
+						//}
+						
+						attpos++;
+					}
+				}
+				sw.Close();
+			}
+		}
 	}
 }

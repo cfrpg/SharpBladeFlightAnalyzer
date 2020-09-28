@@ -284,6 +284,13 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
+            <TabItem Header="导出" Width="100" Height="30">
+                <TabControl TabStripPlacement="Left">
+                    <TabItem Header="Tacview" Width="100" Height="30">
+                        <Button x:Name="exportAcmiBtn" Content="导出acmi" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Click="exportAcmiBtn_Click"/>
+                    </TabItem>
+                </TabControl>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>
