@@ -192,8 +192,8 @@ namespace SharpBladeFlightAnalyzer
 				}
 				return a.Name.CompareTo(b.Name);
 			});
-
-			for(int i=0;i<dataFields.Count;i++)
+			dataFields.TrimExcess();
+			for (int i=0;i<dataFields.Count;i++)
 			{
 				if (fieldConfigs.ContainsKey(dataFields[i].Name))
 				{
@@ -207,8 +207,12 @@ namespace SharpBladeFlightAnalyzer
 						dataFields.RemoveAt(i);
 						i--;
 					}
-				}				
-			}			
+				}
+				
+				dataFields[i].Timestamps.TrimExcess();
+				dataFields[i].Values.TrimExcess();
+			}
+			GC.Collect();
 			return true;
 		}
 
@@ -458,7 +462,7 @@ namespace SharpBladeFlightAnalyzer
 					newfield.Add(new Tuple<string, DataField>(old[i].Item1, f));
 				}
 				fieldNameDict.Add(newMsgName, newfield);
-			}			
+			}
 			return true;
 		}
 
@@ -534,8 +538,11 @@ namespace SharpBladeFlightAnalyzer
 				}			
 				values.Add(value);
 			}
+			
 			for(int i=0;i< values.Count;i++)
 			{
+				if (fields[i].Item2.Flag != SpecialField.None)
+					continue;
 				//fields[i].Item2.Data.Add(new Tuple<double, double>(ts, values[i]));
 				fields[i].Item2.Timestamps.Add(ts);
 				fields[i].Item2.Values.Add(values[i]);
