@@ -44,5 +44,10 @@ namespace SharpBladeFlightAnalyzer
 		{
 			this.Hide();
 		}
+
+		private void messageList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			
+		}
 	}
 }

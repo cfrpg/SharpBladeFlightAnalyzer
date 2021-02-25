@@ -34,6 +34,8 @@ namespace SharpBladeFlightAnalyzer
 			InitializeComponent();
 			fieldListWindow = new FieldListWindow();
 			fieldListWindow.okBtn.Click += OkBtn_Click;
+			fieldListWindow.messageList.MouseDoubleClick += MessageList_MouseDoubleClick;
+			fieldListWindow.exportBtn.Click += ExportBtn_Click;
 			fieldConfigs = new Dictionary<string, FieldConfig>();
 			FileInfo fi = new FileInfo(Environment.CurrentDirectory + "\\config\\Fields.csv");
 			if(fi.Exists)
@@ -59,6 +61,83 @@ namespace SharpBladeFlightAnalyzer
 			//currentPage = (LogPageControl)((TabPage)mainTabControl.Items[0]).Content;
 		}
 
+		private void ExportBtn_Click(object sender, RoutedEventArgs e)
+		{
+			if (fieldListWindow.messageList.SelectedItem == null)
+				return;
+			MessageViewModel mvm = ((MessageViewModel)(fieldListWindow.messageList.SelectedItem));
+			System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+			sfd.Filter = "csv files (*.csv)|*.csv";
+			//sfd.AddExtension = true;
+			if(mvm.IsMassage)
+			{
+				//export message
+				Message msg = mvm.Message;
+				sfd.FileName = msg.Name;
+				if (sfd.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+					return;
+				StreamWriter sw = new StreamWriter(sfd.FileName, false);
+				//creat header
+				sw.Write("Time,");
+				foreach (var v in msg.FieldDict)
+				{
+					if (v.Value.Values.Count == 0)
+						continue;
+					sw.Write(v.Value.Name);
+					sw.Write(",");
+				}
+				sw.WriteLine();
+				//write data
+				for(int i=0;i<msg.TimeStamps.Count;i++)
+				{
+					sw.Write(msg.TimeStamps[i]);
+					sw.Write(",");
+					foreach(var v in msg.FieldDict)
+					{
+						if (v.Value.Values.Count == 0)
+							continue;
+						sw.Write(v.Value.Values[i]);
+						sw.Write(",");
+					}
+					sw.WriteLine();
+				}
+				sw.Close();
+			}
+			else
+			{
+				//export data field
+				DataField df = mvm.DataField;
+				sfd.FileName = df.Topic.Name+"."+df.Name;
+				if (sfd.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+					return;
+				StreamWriter sw = new StreamWriter(sfd.FileName, false);
+				//creat header				
+				
+				sw.Write("Time,");
+				sw.Write(df.Name);
+				sw.WriteLine(",");
+				//write data
+				for (int i = 0; i < df.Timestamps.Count; i++)
+				{
+					sw.Write(df.Timestamps[i]);
+					sw.Write(",");					
+					sw.Write(df.Values[i]);
+					sw.WriteLine(",");
+				}
+				sw.Close();
+			}
+			ShowMessageBox("导出成功!");
+		}
+
+		private void MessageList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if (fieldListWindow.messageList.SelectedItem != null)
+			{
+				if (!((MessageViewModel)(fieldListWindow.messageList.SelectedItem)).IsMassage)
+					currentPage.AddLine(((MessageViewModel)(fieldListWindow.messageList.SelectedItem)).DataField);
+			}
+		}
+
 		private void AddFieldBtn_Click(object sender, RoutedEventArgs e)
 		{
 			setFieldList();
@@ -69,9 +148,10 @@ namespace SharpBladeFlightAnalyzer
 
 		private void OkBtn_Click(object sender, RoutedEventArgs e)
 		{
-			if (fieldListWindow.fieldList.SelectedItem != null)
+			if (fieldListWindow.messageList.SelectedItem != null)
 			{
-				currentPage.AddLine((DataField)fieldListWindow.fieldList.SelectedItem);
+				if(!((MessageViewModel)(fieldListWindow.messageList.SelectedItem)).IsMassage)
+					currentPage.AddLine(((MessageViewModel)(fieldListWindow.messageList.SelectedItem)).DataField);
 			}
 		}
 
@@ -83,8 +163,8 @@ namespace SharpBladeFlightAnalyzer
 
 		private void setFieldList()
 		{
-			fieldListWindow.fieldList.ItemsSource = currentPage.LogFile.DataFields;
-
+			//fieldListWindow.fieldList.ItemsSource = currentPage.LogFile.DataFields;
+			fieldListWindow.messageList.ItemsSource = currentPage.LogFile.MessageList;			
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -120,8 +200,14 @@ namespace SharpBladeFlightAnalyzer
 			else
 			{
 				currentPage = null;
-				fieldListWindow.fieldList.ItemsSource = null;
+				//fieldListWindow.fieldList.ItemsSource = null;
+				fieldListWindow.messageList.ItemsSource = null;
 			}
+		}
+
+		private void ShowMessageBox(string str)
+		{
+			MessageBox.Show(str, "SharpBladeFlightAnalyzer");
 		}
 	}
 }

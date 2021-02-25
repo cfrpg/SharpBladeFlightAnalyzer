@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using System.IO;
+using InteractiveDataDisplay.WPF;
 
 
 namespace SharpBladeFlightAnalyzer
@@ -63,13 +64,12 @@ namespace SharpBladeFlightAnalyzer
 			graphList.SelectedIndex = graphs.Count - 2;
 			setCurrentGraph(g);
 			Dispatcher.BeginInvoke(new Action(() => currentGraph.TakeSnapShot(mainChart)), System.Windows.Threading.DispatcherPriority.ContextIdle, null);
-
-
+			
 		}
 		
 		public void AddLine(string name)
 		{
-			AddLine(logFile.FieldDict[name]);
+			//AddLine(logFile.FieldDict[name]);
 		}
 
 		public void AddLine(DataField df)
@@ -248,24 +248,27 @@ namespace SharpBladeFlightAnalyzer
 
 		private void exportAcmiBtn_Click(object sender, RoutedEventArgs e)
 		{
-			if ((!logFile.FieldDict.ContainsKey("vehicle_global_position.lon")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_global_position.lat")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_global_position.alt")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_attitude.roll")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_attitude.pitch")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_attitude.yaw")))
+			if((!logFile.FormatList.ContainsKey("vehicle_global_position"))||
+				(!logFile.FormatList.ContainsKey("vehicle_attitude"))||
+				(logFile.FormatList["vehicle_global_position"].SubscribedID.Count==0)||
+				(logFile.FormatList["vehicle_attitude"].SubscribedID.Count == 0)
+				)
 			{
 				MessageBox.Show("数据不全");
 				return;
 			}
 			DataField[] posData = new DataField[3];
 			DataField[] attData = new DataField[3];
-			posData[0] = logFile.FieldDict["vehicle_global_position.lon"];
-			posData[1] = logFile.FieldDict["vehicle_global_position.lat"];
-			posData[2] = logFile.FieldDict["vehicle_global_position.alt"];
-			attData[0] = logFile.FieldDict["vehicle_attitude.roll"];
-			attData[1] = logFile.FieldDict["vehicle_attitude.pitch"];
-			attData[2] = logFile.FieldDict["vehicle_attitude.yaw"];
+			int id = logFile.FormatList["vehicle_global_position"].SubscribedID[0];
+			posData[0] = logFile.MessageDict[id].FieldDict["lon"];
+			posData[1] = logFile.MessageDict[id].FieldDict["lat"];
+			posData[2] = logFile.MessageDict[id].FieldDict["alt"];
+
+			id= logFile.FormatList["vehicle_attitude"].SubscribedID[0];
+			attData[0] = logFile.MessageDict[id].FieldDict["roll"];
+			attData[1] = logFile.MessageDict[id].FieldDict["pitch"];
+			attData[2] = logFile.MessageDict[id].FieldDict["yaw"];
+			
 			double[] attFilter = new double[3];
 
 			System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
@@ -284,15 +287,15 @@ namespace SharpBladeFlightAnalyzer
 				int pospos = 0, attpos = 0;
 				var posTimes = posData[0].Timestamps;
 				var attTimes = attData[0].Timestamps;
-				sw.WriteLine("#{0}",Math.Min(posTimes[0],attTimes[0]));
+				sw.WriteLine("#{0}", Math.Min(posTimes[0], attTimes[0]));
 				sw.WriteLine("101,T={0}|{1}|{2}", posData[0].Values[0], posData[1].Values[0], posData[2].Values[0]);
 				hdg = attData[2].Values[0] * 57.29577951;
 				while (pospos < posTimes.Count || attpos < attTimes.Count)
 				{
 					int flag = 0;
-					if(pospos < posTimes.Count && attpos < attTimes.Count)
+					if (pospos < posTimes.Count && attpos < attTimes.Count)
 					{
-						if(posTimes[pospos]< attTimes[attpos])
+						if (posTimes[pospos] < attTimes[attpos])
 						{
 							flag = 1;
 						}
@@ -301,7 +304,7 @@ namespace SharpBladeFlightAnalyzer
 							flag = 2;
 						}
 					}
-					else if(pospos < posTimes.Count)
+					else if (pospos < posTimes.Count)
 					{
 						flag = 1;
 					}
@@ -309,11 +312,11 @@ namespace SharpBladeFlightAnalyzer
 					{
 						flag = 2;
 					}
-					if(flag==1)
+					if (flag == 1)
 					{
 						//Update pos
 						sw.WriteLine("#" + posTimes[pospos].ToString());
-					
+
 						sw.WriteLine("101,T={0}|{1}|{2}|{3}|{4}|{5}", posData[0].Values[pospos], posData[1].Values[pospos], posData[2].Values[pospos], attFilter[0] * 57.29577951, attFilter[1] * 57.29577951, hdg);
 						pospos++;
 					}
@@ -327,6 +330,7 @@ namespace SharpBladeFlightAnalyzer
 							else
 							{
 								attFilter[i] = 0.95 * attFilter[i] + 0.05 * attData[i].Values[attpos];
+								//attFilter[i] = attData[i].Values[attpos];
 							}
 						}
 						hdg = attData[2].Values[attpos] * 57.29577951;
@@ -349,24 +353,26 @@ namespace SharpBladeFlightAnalyzer
 
 		private void exportCsvBtn_Click(object sender, RoutedEventArgs e)
 		{
-			if ((!logFile.FieldDict.ContainsKey("vehicle_global_position.lon")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_global_position.lat")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_global_position.alt")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_attitude.roll")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_attitude.pitch")) ||
-				(!logFile.FieldDict.ContainsKey("vehicle_attitude.yaw")))
+			if ((!logFile.FormatList.ContainsKey("vehicle_global_position")) ||
+				(!logFile.FormatList.ContainsKey("vehicle_attitude")) ||
+				(logFile.FormatList["vehicle_global_position"].SubscribedID.Count == 0) ||
+				(logFile.FormatList["vehicle_attitude"].SubscribedID.Count == 0)
+				)
 			{
 				MessageBox.Show("数据不全");
 				return;
 			}
 			DataField[] posData = new DataField[3];
 			DataField[] attData = new DataField[3];
-			posData[0] = logFile.FieldDict["vehicle_global_position.lon"];
-			posData[1] = logFile.FieldDict["vehicle_global_position.lat"];
-			posData[2] = logFile.FieldDict["vehicle_global_position.alt"];
-			attData[0] = logFile.FieldDict["vehicle_attitude.roll"];
-			attData[1] = logFile.FieldDict["vehicle_attitude.pitch"];
-			attData[2] = logFile.FieldDict["vehicle_attitude.yaw"];
+			int id = logFile.FormatList["vehicle_global_position"].SubscribedID[0];
+			posData[0] = logFile.MessageDict[id].FieldDict["lon"];
+			posData[1] = logFile.MessageDict[id].FieldDict["lat"];
+			posData[2] = logFile.MessageDict[id].FieldDict["alt"];
+
+			id = logFile.FormatList["vehicle_attitude"].SubscribedID[0];
+			attData[0] = logFile.MessageDict[id].FieldDict["roll"];
+			attData[1] = logFile.MessageDict[id].FieldDict["pitch"];
+			attData[2] = logFile.MessageDict[id].FieldDict["yaw"];
 			double[] attFilter = new double[3];
 
 			System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
@@ -381,7 +387,7 @@ namespace SharpBladeFlightAnalyzer
 				double hdg;
 				int pospos = 0, attpos = 0;
 				var posTimes = posData[0].Timestamps;
-				var attTimes = attData[0].Timestamps;				
+				var attTimes = attData[0].Timestamps;
 				while (pospos < posTimes.Count || attpos < attTimes.Count)
 				{
 					int flag = 0;

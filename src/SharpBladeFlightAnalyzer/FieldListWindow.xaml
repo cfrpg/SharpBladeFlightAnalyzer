@@ -11,18 +11,17 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="30"/>            
         </Grid.RowDefinitions>
-        <ListView x:Name="fieldList" ItemsSource="{Binding}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="数据" Width="200" DisplayMemberBinding="{Binding DispName}"/>
-                    <GridViewColumn Header="描述" Width="200" DisplayMemberBinding="{Binding Description}"/>
-                    <GridViewColumn Header="数据量" Width="60" DisplayMemberBinding="{Binding Values.Count}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <TreeView x:Name="messageList" MouseDoubleClick="messageList_MouseDoubleClick">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding DisplayName}"/>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
             <Button x:Name="okBtn" Content="确定" Width="75" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0" Click="okBtn_Click"/>
             <Button x:Name="closeBtn" Content="关闭" Width="75" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0" Click="closeBtn_Click"/>
         </StackPanel>
+        <Button x:Name="exportBtn" Grid.Row="1" Content="导出..." Width="75" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"/>
     </Grid>
 </Window>

@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace SharpBladeFlightAnalyzer
 {
-	public class DataField
+	public class DataField:IDisposable
 	{
 		string name;
 		string dispName;
 		string description;
 		SpecialField flag;
+		Message topic;
 		
 		//List<Tuple<double, double>> data;
 
@@ -60,19 +61,29 @@ namespace SharpBladeFlightAnalyzer
 			set { dispName = value; }
 		}
 
-		public DataField(string n):this(n,SpecialField.None)
+		public Message Topic { get => topic; set => topic = value; }
+
+		public DataField(string n,Message t):this(n,SpecialField.None,t)
 		{
 			
 		}
 
-		public DataField(string n,SpecialField sf)
+		public DataField(string n,SpecialField sf,Message t)
 		{
 			name = n;
-			dispName = n;
+			dispName = t.Name+"."+n;
 			//data = new List<Tuple<double, double>>();
-			timestamps = new List<double>();
+			//timestamps = new List<double>();
 			values = new List<double>();
 			flag = sf;
+			topic = t;
+			timestamps = t.TimeStamps;
+		}
+
+		public void Dispose()
+		{
+			values.Clear();
+			values.TrimExcess();
 		}
 	}
 

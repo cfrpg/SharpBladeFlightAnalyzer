@@ -101,7 +101,10 @@
     </Compile>
     <Compile Include="Graph.cs" />
     <Compile Include="LoggedMessage.cs" />
+    <Compile Include="MessageFormat.cs" />
+    <Compile Include="MessageViewModel.cs" />
     <Compile Include="Polar.cs" />
+    <Compile Include="Message.cs" />
     <Compile Include="ULogFile.cs" />
     <Page Include="Controls\LogPageControl.xaml">
       <SubType>Designer</SubType>

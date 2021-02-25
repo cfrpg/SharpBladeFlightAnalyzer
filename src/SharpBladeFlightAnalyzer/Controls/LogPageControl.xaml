@@ -166,7 +166,7 @@
                     </Grid>
                     <GridSplitter x:Name="gridSplitter" Grid.Column="1" Width="3" HorizontalAlignment="Center" Background="LightGray"/>
                     <Border Grid.Column="2">
-                        <d3:Chart x:Name="mainChart" IsAutoFitEnabled="True" Margin="0,5,5,0" LayoutUpdated="mainChart_LayoutUpdated" LegendVisibility="Hidden">
+                        <d3:Chart x:Name="mainChart" IsAutoFitEnabled="True" Margin="0,5,5,0" LayoutUpdated="mainChart_LayoutUpdated" LegendVisibility="Hidden">                            
                             <Grid x:Name="Lines"/>
                         </d3:Chart>
                     </Border>
