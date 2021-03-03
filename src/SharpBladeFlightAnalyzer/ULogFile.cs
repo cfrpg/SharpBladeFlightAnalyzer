@@ -162,11 +162,16 @@ namespace SharpBladeFlightAnalyzer
 				foreach(var df in v.Value.FieldDict)
 				{
 					if (df.Value.Flag == SpecialField.Padding)
+					{
+						df.Value.Dispose();
 						continue;
+					}
 					if (df.Value.Flag == SpecialField.TimeStamp)
-						mvm.Children.Add(new MessageViewModel() { Name = df.Key + "_[TS]", DataField = df.Value });
+					{						
+						continue;//mvm.Children.Add(new MessageViewModel() { Name = df.Key + "_[TS]", DataField = df.Value });
+					}
 					else
-						mvm.Children.Add(new MessageViewModel() { Name = df.Key, DataField = df.Value ,Size=df.Value.Values.Count});
+						mvm.Children.Add(new MessageViewModel() { Name = df.Key, DataField = df.Value, Size = df.Value.Values.Count });
 					df.Value.Values.TrimExcess();
 				}
 				messageList.Add(mvm);
