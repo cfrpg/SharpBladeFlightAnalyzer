@@ -52,6 +52,11 @@ namespace SharpBladeFlightAnalyzer
 				}
 				sr.Close();
 			}
+			string[] args = Environment.GetCommandLineArgs();
+			if(args.Length>1)
+			{				
+				loadFile(args[1]);
+			}
 
 			//ULogFile f = new ULogFile();
 			//f.Load("D:\\temp\\log.ulg");
@@ -172,21 +177,7 @@ namespace SharpBladeFlightAnalyzer
 			System.Windows.Forms.OpenFileDialog ofd = new System.Windows.Forms.OpenFileDialog();
 			if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 			{
-				string path = ofd.FileName;
-				ULogFile f = new ULogFile();
-				if (f.Load(path,fieldConfigs))
-				{
-					LogPageControl lpc = new LogPageControl(f, this);
-					lpc.addFieldBtn.Click += AddFieldBtn_Click;
-					TabPage page = new TabPage();
-					page.Header = f.File.Name;
-
-					page.Content = lpc;
-					page.DisposableContent = f;
-					mainTabControl.Items.Insert(mainTabControl.Items.Count - 1, page);
-					mainTabControl.SelectedIndex = mainTabControl.Items.Count - 2;
-					currentPage = lpc;
-				}
+				loadFile(ofd.FileName);				
 			}
 		}
 
@@ -208,6 +199,35 @@ namespace SharpBladeFlightAnalyzer
 		private void ShowMessageBox(string str)
 		{
 			MessageBox.Show(str, "SharpBladeFlightAnalyzer");
+		}
+
+		private void Window_Drop(object sender, DragEventArgs e)
+		{
+			if(e.Data.GetDataPresent(DataFormats.FileDrop))
+			{
+				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+				
+				loadFile(files[0]);
+				
+			}
+		}
+
+		private void loadFile(string path)
+		{			
+			ULogFile f = new ULogFile();
+			if (f.Load(path, fieldConfigs))
+			{
+				LogPageControl lpc = new LogPageControl(f, this);
+				lpc.addFieldBtn.Click += AddFieldBtn_Click;
+				TabPage page = new TabPage();
+				page.Header = f.File.Name;
+
+				page.Content = lpc;
+				page.DisposableContent = f;
+				mainTabControl.Items.Insert(mainTabControl.Items.Count - 1, page);
+				mainTabControl.SelectedIndex = mainTabControl.Items.Count - 2;
+				currentPage = lpc;
+			}
 		}
 	}
 }

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SharpBladeFlightAnalyzer"
         xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
         mc:Ignorable="d"
-        Title="SharpBladeFlightAnalyzer - cfrpg" Height="700" Width="1000" MinHeight="700" MinWidth="1000" Closing="Window_Closing">
+        Title="SharpBladeFlightAnalyzer - cfrpg" Height="700" Width="1000" MinHeight="700" MinWidth="1000" Closing="Window_Closing" Drop="Window_Drop" AllowDrop="True">
     <Window.Resources>
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">
