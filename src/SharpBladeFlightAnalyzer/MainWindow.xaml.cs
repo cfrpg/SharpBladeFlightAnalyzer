@@ -37,10 +37,10 @@ namespace SharpBladeFlightAnalyzer
 			fieldListWindow.messageList.MouseDoubleClick += MessageList_MouseDoubleClick;
 			fieldListWindow.exportBtn.Click += ExportBtn_Click;
 			fieldConfigs = new Dictionary<string, FieldConfig>();
-			FileInfo fi = new FileInfo(Environment.CurrentDirectory + "\\config\\Fields.csv");
+			FileInfo fi = new FileInfo(System.AppDomain.CurrentDomain.BaseDirectory + "config\\Fields.csv");
 			if(fi.Exists)
 			{
-				StreamReader sr = new StreamReader(Environment.CurrentDirectory + "\\config\\Fields.csv");
+				StreamReader sr = new StreamReader(System.AppDomain.CurrentDomain.BaseDirectory + "config\\Fields.csv");
 				sr.ReadLine();
 				while(!sr.EndOfStream)
 				{
@@ -57,6 +57,7 @@ namespace SharpBladeFlightAnalyzer
 			{				
 				loadFile(args[1]);
 			}
+			
 
 			//ULogFile f = new ULogFile();
 			//f.Load("D:\\temp\\log.ulg");
@@ -175,6 +176,7 @@ namespace SharpBladeFlightAnalyzer
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			System.Windows.Forms.OpenFileDialog ofd = new System.Windows.Forms.OpenFileDialog();
+			ofd.Filter = "ulog日志文件 (*.ulg)|*.ulg|All files (*.*)|*.*";
 			if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 			{
 				loadFile(ofd.FileName);				

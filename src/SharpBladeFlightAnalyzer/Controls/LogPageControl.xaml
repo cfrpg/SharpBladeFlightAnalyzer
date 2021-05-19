@@ -293,7 +293,7 @@
                                 <ColumnDefinition Width="1*"/>
                             </Grid.ColumnDefinitions>
                             <Button x:Name="exportAcmiBtn" Content="导出acmi" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Click="exportAcmiBtn_Click"/>
-                            <Button x:Name="exportCsvBtn" Content="导出csv" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Grid.Column="1" Click="exportCsvBtn_Click"/>
+                            <Button x:Name="exportCsvBtn" Content="导出csv" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Grid.Column="1" Click="exportCsvBtn_Click"/>                           
                         </Grid>                       
                     </TabItem>
                 </TabControl>

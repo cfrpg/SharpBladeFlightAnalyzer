@@ -131,10 +131,10 @@ namespace SharpBladeFlightAnalyzer
 			while (readMessage()) ;			
 			reader.Close();
 
-			FileInfo fi = new FileInfo(Environment.CurrentDirectory + "\\config\\Quaternions.txt");
+			FileInfo fi = new FileInfo(System.AppDomain.CurrentDomain.BaseDirectory + "config\\Quaternions.txt");
 			if(fi.Exists)
 			{
-				StreamReader sr = new StreamReader(Environment.CurrentDirectory + "\\config\\Quaternions.txt");
+				StreamReader sr = new StreamReader(System.AppDomain.CurrentDomain.BaseDirectory + "config\\Quaternions.txt");
 				while(!sr.EndOfStream)
 				{
 					string line = sr.ReadLine();
