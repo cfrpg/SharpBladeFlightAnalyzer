@@ -1,11 +1,11 @@
 vehicle_attitude.q
 //vehicle_attitude.delta_q_reset delta_reset
-vehicle_attitude_setpoint.q_d d
-fw_virtual_attitude_setpoint.q_d d
+vehicle_attitude_setpoint.q_d
+fw_virtual_attitude_setpoint.q_d
 camera_capture.q
 vehicle_vision_attitude.q
 //vehicle_vision_attitude.delta_q_reset vehicle_vision_attitude.delta_reset
 att_pos_mocap.q
 vehicle_attitude_groundtruth.q
 //vehicle_attitude_groundtruth.delta_q_reset vehicle_attitude_groundtruth.delta_reset
-mc_virtual_attitude_setpoint.q_d d
+mc_virtual_attitude_setpoint.q_d
