@@ -38,6 +38,12 @@ namespace SharpBladeFlightAnalyzer
 
 		bool defEndFlag = false;
 
+		bool readCompleted;
+
+		long currLoadPos;
+
+		bool[] ignoreErrorFlags;
+
 		public ulong Timestamp
 		{
 			get { return timestamp; }
@@ -97,6 +103,10 @@ namespace SharpBladeFlightAnalyzer
 		public List<MessageViewModel> MessageList { get => messageList; set => messageList = value; }
 		public Dictionary<string, MessageFormat> FormatList { get => formatList; set => formatList = value; }
 		public Dictionary<int, Message> MessageDict { get => messageDict; set => messageDict = value; }
+		public long TotalSize { get => reader.BaseStream.Length; }
+
+		public long CurrPos { get => currLoadPos; }
+		public bool ReadCompleted { get => readCompleted; set => readCompleted = value; }
 
 		public ULogFile()
 		{
@@ -105,7 +115,9 @@ namespace SharpBladeFlightAnalyzer
 			MessageDict = new Dictionary<int, Message>();
 			infomations=new List<Tuple<string, string>>();
 			parameters=new List<Parameter>();
-			Messages = new List<LoggedMessage>();				
+			Messages = new List<LoggedMessage>();
+			readCompleted = false;
+			ignoreErrorFlags = new bool[256];
 		}
 
 		public bool Load(string path, Dictionary<string, FieldConfig> fieldConfigs)
@@ -129,7 +141,10 @@ namespace SharpBladeFlightAnalyzer
 				return false;
 			version = buff[7];
 			timestamp = reader.ReadUInt64();
-			while (readMessage()) ;			
+			while (readMessage())
+			{
+				currLoadPos = reader.BaseStream.Position;
+			}
 			reader.Close();
 
 			FileInfo fi = new FileInfo(System.AppDomain.CurrentDomain.BaseDirectory + "config\\Quaternions.txt");
@@ -185,6 +200,7 @@ namespace SharpBladeFlightAnalyzer
 			messageList.TrimExcess();
 						
 			GC.Collect();
+			readCompleted = true;
 			return true;
 		}
 
@@ -269,9 +285,16 @@ namespace SharpBladeFlightAnalyzer
 			
 			if (!res)
 			{
+				if(ignoreErrorFlags[msgtype])
+				{
+					return true;
+				}
 				errmsg = "读取文件时发生错误：" + System.Environment.NewLine + errmsg + System.Environment.NewLine + "是否继续？";
 				if (MessageBox.Show(errmsg, "SharpBladeFlightAnalyzer", MessageBoxButtons.YesNo) == DialogResult.Yes)
+				{
+					ignoreErrorFlags[msgtype] = true;
 					return true;
+				}
 				else
 					return false;
 			}

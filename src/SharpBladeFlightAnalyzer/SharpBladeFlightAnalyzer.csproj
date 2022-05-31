@@ -100,6 +100,7 @@
       <DependentUpon>FieldListWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Graph.cs" />
+    <Compile Include="LoadViewModel.cs" />
     <Compile Include="LoggedMessage.cs" />
     <Compile Include="MessageFormat.cs" />
     <Compile Include="MessageViewModel.cs" />

@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 
 namespace SharpBladeFlightAnalyzer
@@ -28,6 +29,10 @@ namespace SharpBladeFlightAnalyzer
 		FieldListWindow fieldListWindow;
 
 		Dictionary<string, FieldConfig> fieldConfigs;
+
+		LoadViewModel lvm;
+
+		bool isloading;
 
 		public MainWindow()
 		{
@@ -52,12 +57,12 @@ namespace SharpBladeFlightAnalyzer
 				}
 				sr.Close();
 			}
-			string[] args = Environment.GetCommandLineArgs();
-			if(args.Length>1)
-			{				
-				loadFile(args[1]);
-			}
+
+			isloading = false;
+			lvm = new LoadViewModel();
 			
+			lvm.Visibility = Visibility.Hidden;
+			mainTabControl.DataContext = lvm;
 
 			//ULogFile f = new ULogFile();
 			//f.Load("D:\\temp\\log.ulg");
@@ -179,8 +184,10 @@ namespace SharpBladeFlightAnalyzer
 			ofd.Filter = "ulog日志文件 (*.ulg)|*.ulg|All files (*.*)|*.*";
 			if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 			{
-				loadFile(ofd.FileName);				
+				//loadFile(ofd.FileName);	
+				startLoadFile(ofd.FileName);			
 			}
+			
 		}
 
 		private void mainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -205,11 +212,13 @@ namespace SharpBladeFlightAnalyzer
 
 		private void Window_Drop(object sender, DragEventArgs e)
 		{
+			if (isloading)
+				return;
 			if(e.Data.GetDataPresent(DataFormats.FileDrop))
 			{
 				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 				
-				loadFile(files[0]);
+				startLoadFile(files[0]);
 				
 			}
 		}
@@ -229,6 +238,68 @@ namespace SharpBladeFlightAnalyzer
 				mainTabControl.Items.Insert(mainTabControl.Items.Count - 1, page);
 				mainTabControl.SelectedIndex = mainTabControl.Items.Count - 2;
 				currentPage = lpc;
+			}
+		}
+
+		private void startLoadFile(string path)
+		{
+			if (isloading)
+				return;
+			isloading = true;
+			Thread uiThread = new Thread(new ParameterizedThreadStart(updateUI));
+			uiThread.IsBackground = true;
+			uiThread.Start(path);
+			
+		}
+
+		private void updateUI(object o)
+		{
+			string path = (string)o;
+			Thread loadThread= new Thread(new ParameterizedThreadStart(loadingFile));
+			loadThread.IsBackground = true;
+			lvm.CurrProgress = 0;
+			lvm.Visibility = Visibility.Visible;
+			ULogFile f = new ULogFile();
+			loadThread.Start(new Tuple<ULogFile, string>(f, path));
+			Thread.Sleep(20);
+			lvm.MaxProgress = f.TotalSize;
+			while (true)
+			{
+				lvm.CurrProgress = f.CurrPos;
+				Thread.Sleep(20);
+				if (f.ReadCompleted)
+					break;
+			}
+			lvm.Visibility = Visibility.Hidden;
+			Dispatcher.Invoke(new Action(delegate ()
+			{
+				LogPageControl lpc = new LogPageControl(f, this);
+				lpc.addFieldBtn.Click += AddFieldBtn_Click;
+				TabPage page = new TabPage();
+				page.Header = f.File.Name;
+
+				page.Content = lpc;
+				page.DisposableContent = f;
+				mainTabControl.Items.Insert(mainTabControl.Items.Count - 1, page);
+				mainTabControl.SelectedIndex = mainTabControl.Items.Count - 2;
+				currentPage = lpc;
+			}));
+			isloading = false;
+		}
+
+		private void loadingFile(object o)
+		{
+			Tuple<ULogFile, string> args = (Tuple<ULogFile, string>)o;
+			ULogFile f = args.Item1;
+			bool res = f.Load(args.Item2, fieldConfigs);
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			string[] args = Environment.GetCommandLineArgs();
+			if (args.Length > 1)
+			{
+				startLoadFile(args[1]);
 			}
 		}
 	}

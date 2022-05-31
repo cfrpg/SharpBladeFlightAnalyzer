@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SharpBladeFlightAnalyzer"
         xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
         mc:Ignorable="d"
-        Title="SharpBladeFlightAnalyzer - cfrpg" Height="700" Width="1000" MinHeight="700" MinWidth="1000" Closing="Window_Closing" Drop="Window_Drop" AllowDrop="True">
+        Title="SharpBladeFlightAnalyzer - cfrpg" Height="700" Width="1000" MinHeight="700" MinWidth="1000" Closing="Window_Closing" Drop="Window_Drop" AllowDrop="True" Loaded="Window_Loaded">
     <Window.Resources>
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">
@@ -75,8 +75,8 @@
                     </Grid.ColumnDefinitions>
                     <Rectangle Grid.Column="1" Grid.Row="1" Stroke="Gray" StrokeThickness="10" StrokeDashArray="3 1.55" RadiusX="20" RadiusY="20"/>
                     <Path Grid.Column="1" Grid.Row="1" Data="M100,60 100,140 M60,100 140,100" Stroke="Gray" StrokeThickness="10"/>
-                    <Button x:Name="loadButton" Grid.Column="1" Grid.Row="1" Background="Transparent" BorderBrush="Transparent" Foreground="Transparent" Style="{DynamicResource ButtonStyle1}" Click="Button_Click"/>
-                    <ProgressBar x:Name="loadProgressBar" HorizontalAlignment="Center" Height="20" VerticalAlignment="Center" Width="300" Grid.Row="1" Grid.ColumnSpan="3" Margin="0" Visibility="Hidden"/>
+                    <Button Grid.Column="1" Grid.Row="1" Background="Transparent" BorderBrush="Transparent" Foreground="Transparent" Style="{DynamicResource ButtonStyle1}" Click="Button_Click"/>
+                    <ProgressBar HorizontalAlignment="Center" Height="20" VerticalAlignment="Top" Width="300" Grid.Row="2" Grid.ColumnSpan="3" Margin="0,30,0,0" Visibility="{Binding Visibility}" Maximum="{Binding MaxProgress}" Value="{Binding CurrProgress}"/>
 
                 </Grid>
             </local:TabPage>
