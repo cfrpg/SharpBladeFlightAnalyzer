@@ -255,20 +255,35 @@
             </TabItem>
             <TabItem Header="参数" Width="100" Height="30" >
                 <ListView x:Name="paramList" ItemsSource="{Binding}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="BorderBrush" Value="LightGray" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="参数" Width="150" DisplayMemberBinding="{Binding Item1}"/>
-                            <GridViewColumn Header="值" Width="150" DisplayMemberBinding="{Binding Item2}"/>
+                            <GridViewColumn Header="参数" Width="150" DisplayMemberBinding="{Binding Name}"/>
+                            <GridViewColumn Header="值" Width="150" DisplayMemberBinding="{Binding Value}"/>
+                            <GridViewColumn Header="系统默认值" Width="150" DisplayMemberBinding="{Binding DisplayedSysDefalut}"/>
+                            <GridViewColumn Header="机型默认值" Width="150" DisplayMemberBinding="{Binding DisplayedAirframeDefault}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
             </TabItem>
             <TabItem Header="消息" Width="100" Height="30">
                 <ListView x:Name="msgList" ItemsSource="{Binding}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="BorderBrush" Value="LightGray" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="等级" Width="150" DisplayMemberBinding="{Binding Level}"/>
                             <GridViewColumn Header="时间" Width="150" DisplayMemberBinding="{Binding Time,StringFormat={}{0:HH:mm:ss.fff}}"/>
+                            <GridViewColumn Header="来源" Width="100" DisplayMemberBinding="{Binding TagString}"/>
                             <GridViewColumn Header="消息" Width="400" DisplayMemberBinding="{Binding Message}"/>
                         </GridView>
                     </ListView.View>

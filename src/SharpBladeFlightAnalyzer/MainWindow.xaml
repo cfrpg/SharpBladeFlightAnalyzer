@@ -75,7 +75,9 @@
                     </Grid.ColumnDefinitions>
                     <Rectangle Grid.Column="1" Grid.Row="1" Stroke="Gray" StrokeThickness="10" StrokeDashArray="3 1.55" RadiusX="20" RadiusY="20"/>
                     <Path Grid.Column="1" Grid.Row="1" Data="M100,60 100,140 M60,100 140,100" Stroke="Gray" StrokeThickness="10"/>
-                    <Button Grid.Column="1" Grid.Row="1" Background="Transparent" BorderBrush="Transparent" Foreground="Transparent" Style="{DynamicResource ButtonStyle1}" Click="Button_Click"/>
+                    <Button x:Name="loadButton" Grid.Column="1" Grid.Row="1" Background="Transparent" BorderBrush="Transparent" Foreground="Transparent" Style="{DynamicResource ButtonStyle1}" Click="Button_Click"/>
+                    <ProgressBar x:Name="loadProgressBar" HorizontalAlignment="Center" Height="20" VerticalAlignment="Center" Width="300" Grid.Row="1" Grid.ColumnSpan="3" Margin="0" Visibility="Hidden"/>
+
                 </Grid>
             </local:TabPage>
 

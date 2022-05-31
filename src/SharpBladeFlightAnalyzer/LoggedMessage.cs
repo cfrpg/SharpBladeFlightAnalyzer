@@ -12,6 +12,7 @@ namespace SharpBladeFlightAnalyzer
 		ulong timestamp;
 		string message;
 		DateTime time;
+		LogTag tag;
 
 		public LogLevel Level
 		{
@@ -39,6 +40,23 @@ namespace SharpBladeFlightAnalyzer
 		{
 			get { return time; }
 		}
+
+		public LogTag Tag { get => tag; set => tag = value; }
+
+		public string TagString
+		{
+			get
+			{
+				if (Tag != LogTag.notag)
+					return tag.ToString();
+				return "";
+			}
+		}
+
+		public LoggedMessage()
+		{
+			tag = LogTag.notag;
+		}
 	}
 
 	public enum LogLevel:byte
@@ -51,5 +69,20 @@ namespace SharpBladeFlightAnalyzer
 		NOTICE = 0x35,
 		INFO = 0x36,
 		DEBUG = 0x37
+	}
+
+	public enum LogTag : ushort
+	{
+		unassigned,
+		mavlink_handler,
+		ppk_handler,
+		camera_handler,
+		ptp_handler,
+		serial_handler,
+		watchdog,
+		io_service,
+		cbuf,
+		ulg,
+		notag=9999
 	}
 }

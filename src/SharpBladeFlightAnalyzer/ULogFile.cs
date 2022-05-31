@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace SharpBladeFlightAnalyzer
 {
@@ -29,7 +30,7 @@ namespace SharpBladeFlightAnalyzer
 		//key,value
 		List<Tuple<string, string>> infomations;
 		//key,value
-		List<Tuple<string, float>> parameters;
+		List<Parameter> parameters;
 
 		List<LoggedMessage> messages;
 
@@ -76,7 +77,7 @@ namespace SharpBladeFlightAnalyzer
 			}
 		}
 
-		public List<Tuple<string, float>> Parameters
+		public List<Parameter> Parameters
 		{
 			get { return parameters; }
 			set { parameters = value; }
@@ -103,7 +104,7 @@ namespace SharpBladeFlightAnalyzer
 			FormatList = new Dictionary<string, MessageFormat>();
 			MessageDict = new Dictionary<int, Message>();
 			infomations=new List<Tuple<string, string>>();
-			parameters=new List<Tuple<string, float>>();
+			parameters=new List<Parameter>();
 			Messages = new List<LoggedMessage>();				
 		}
 
@@ -211,38 +212,71 @@ namespace SharpBladeFlightAnalyzer
 			byte msgtype = reader.ReadByte();
 			if (reader.BaseStream.Length - reader.BaseStream.Position < size)
 				return false;
+			bool res = false;
+			string errmsg="读取类型为"+msgtype.ToString()+"的消息时发生未知错误";
 			switch (msgtype)
 			{
 				case 66://B
-					return readFlagBitset(size);
+					res = readFlagBitset(size);
+					break;
 				case 70://F
-					return readFormatDefinition(size);
+					res = readFormatDefinition(size);
+					break;
 				case 73://I
-					return readInformation(size);
+					res = readInformation(size);
+					break;
 				case 77://M
-					return readInformationMulti(size);
+					res = readInformationMulti(size);
+					break;
 				case 80://P
-					return readParameter(size);
+					res = readParameter(size, false);
+					break;
+				case 81://Q
+					res = readParameter(size, true);
+					break;
 				case 65://A
 					if(!defEndFlag)					
-						expendDefinition();					
-					return readSubscribe(size);
+						expendDefinition();
+					res = readSubscribe(size);
+					break;
 				case 82://R
-					return readUnsubscribe(size);
+					res = readUnsubscribe(size);
+					break;
 				case 68://D
-					return readLoggedData(size);
+					res = readLoggedData(size);
+					break;
 				case 76://L
 					if (!defEndFlag)
 						expendDefinition();
-					return readLoggedString(size);
+					res = readLoggedString(size,false);
+					break;
+				case 67://C Tagged Logged string message
+					res = readLoggedString(size, true);
+					break;
 				case 83://S
-					return readSynchronization(size);
+					res = readSynchronization(size);
+					break;
 				case 79://O
-					return readDropoutMark(size);
+					res = readDropoutMark(size);
+					break;
 				default:
-					Debug.WriteLine("Unknow message type:{0}.", msgtype);
+					Debug.WriteLine("Unknow message type:{0},at {1}, size {2}.", msgtype, reader.BaseStream.Position,size);
+					byte[] tmp= reader.ReadBytes(size);
+					res = false;
+					errmsg = "未知日志消息类型：" + msgtype.ToString();
+					break;
+			}
+			
+			if (!res)
+			{
+				errmsg = "读取文件时发生错误：" + System.Environment.NewLine + errmsg + System.Environment.NewLine + "是否继续？";
+				if (MessageBox.Show(errmsg, "SharpBladeFlightAnalyzer", MessageBoxButtons.YesNo) == DialogResult.Yes)
+					return true;
+				else
 					return false;
 			}
+			
+			return res;
 		}
 		private void expendDefinition()
 		{
@@ -385,26 +419,50 @@ namespace SharpBladeFlightAnalyzer
 			return true;
 		}
 
-		private bool readParameter(ushort msglen)
+		private bool readParameter(ushort msglen,bool def)
 		{
+			Parameter p = new Parameter();
+			byte defaultType=0;
+			if(def)
+			{
+				defaultType = reader.ReadByte();
+			}
 			int keylen = reader.ReadByte();
 			string key = readASCIIString(keylen);
 			string keytype = key.Substring(0, key.IndexOf(' '));
-			string keyname = key.Substring(keytype.Length + 1);
-			float val=0;
+			p.Name = key.Substring(keytype.Length + 1);
+			float v;
 			switch(keytype)
 			{
 				case "int32_t":
-					val = reader.ReadInt32();
+					v = reader.ReadInt32();
 					break;
 				case "float":
-					val = reader.ReadSingle();
+					v = reader.ReadSingle();
 					break;
 				default:
 					Debug.WriteLine("[P]:Unknow parameter type {0}.", keytype);
 					return false;
 			}
-			parameters.Add(new Tuple<string, float>(keyname, val));
+			if (!def)
+			{
+				p.Value = v;
+				parameters.Add(p);
+				return true;
+			}
+			else
+			{				
+				for(int i=0;i<parameters.Count;i++)
+				{
+					if(parameters[i].Name==p.Name)
+					{
+						if ((defaultType & 0x01) != 0)
+							parameters[i].SystemDefaultValue = v;
+						if ((defaultType & 0x02) != 0)
+							parameters[i].AirframeDefaultValue = v;
+					}					
+				}
+			}
 			return true;
 		}
 
@@ -521,10 +579,12 @@ namespace SharpBladeFlightAnalyzer
 			return true;
 		}
 
-		private bool readLoggedString(ushort msglen)
+		private bool readLoggedString(ushort msglen,bool taged)
 		{
 			LoggedMessage msg = new LoggedMessage();
 			msg.Level = (LogLevel)reader.ReadByte();
+			if (taged)
+				msg.Tag = (LogTag)reader.ReadUInt16();
 			msg.Timestamp = reader.ReadUInt64();
 			msg.Message = readASCIIString(msglen - 9);
 			Messages.Add(msg);

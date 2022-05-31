@@ -254,7 +254,7 @@ namespace SharpBladeFlightAnalyzer
 				(logFile.FormatList["vehicle_attitude"].SubscribedID.Count == 0)
 				)
 			{
-				MessageBox.Show("数据不全");
+				MessageBox.Show("数据不全", "SharpBladeFlightAnalyzer");
 				return;
 			}
 			DataField[] posData = new DataField[3];
@@ -359,7 +359,7 @@ namespace SharpBladeFlightAnalyzer
 				(logFile.FormatList["vehicle_attitude"].SubscribedID.Count == 0)
 				)
 			{
-				MessageBox.Show("数据不全");
+				MessageBox.Show("数据不全", "SharpBladeFlightAnalyzer");
 				return;
 			}
 			DataField[] posData = new DataField[3];

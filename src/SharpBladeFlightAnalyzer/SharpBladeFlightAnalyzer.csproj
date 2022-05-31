@@ -103,6 +103,7 @@
     <Compile Include="LoggedMessage.cs" />
     <Compile Include="MessageFormat.cs" />
     <Compile Include="MessageViewModel.cs" />
+    <Compile Include="Parameter.cs" />
     <Compile Include="Polar.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="ULogFile.cs" />
