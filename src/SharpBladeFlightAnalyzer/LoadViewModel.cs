@@ -18,6 +18,8 @@ namespace SharpBladeFlightAnalyzer
 
 		Visibility visibility;
 
+		bool loadFailed;
+
 
 		public double MaxProgress 
 		{ 
@@ -47,5 +49,7 @@ namespace SharpBladeFlightAnalyzer
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Visibility"));
 			}
 		}
+
+		public bool LoadFailed { get => loadFailed; set => loadFailed = value; }
 	}
 }

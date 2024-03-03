@@ -259,7 +259,8 @@ namespace SharpBladeFlightAnalyzer
 			}
 			DataField[] posData = new DataField[3];
 			DataField[] attData = new DataField[3];
-			int id = logFile.FormatList["vehicle_global_position"].SubscribedID[0];
+			//int id = logFile.FormatList["vehicle_global_position"].SubscribedID[0];
+			int id = logFile.FormatList["vehicle_gps_position"].SubscribedID[0];
 			posData[0] = logFile.MessageDict[id].FieldDict["lon"];
 			posData[1] = logFile.MessageDict[id].FieldDict["lat"];
 			posData[2] = logFile.MessageDict[id].FieldDict["alt"];
@@ -288,7 +289,8 @@ namespace SharpBladeFlightAnalyzer
 				var posTimes = posData[0].Timestamps;
 				var attTimes = attData[0].Timestamps;
 				sw.WriteLine("#{0}", Math.Min(posTimes[0], attTimes[0]));
-				sw.WriteLine("101,T={0}|{1}|{2}", posData[0].Values[0], posData[1].Values[0], posData[2].Values[0]);
+				//sw.WriteLine("101,T={0}|{1}|{2}", posData[0].Values[0], posData[1].Values[0], posData[2].Values[0]);
+				sw.WriteLine("101,T={0}|{1}|{2}", posData[0].Values[0]/1E7, posData[1].Values[0] / 1E7, posData[2].Values[0] / 1E3);
 				hdg = attData[2].Values[0] * 57.29577951;
 				while (pospos < posTimes.Count || attpos < attTimes.Count)
 				{
@@ -317,7 +319,7 @@ namespace SharpBladeFlightAnalyzer
 						//Update pos
 						sw.WriteLine("#" + posTimes[pospos].ToString());
 
-						sw.WriteLine("101,T={0}|{1}|{2}|{3}|{4}|{5}", posData[0].Values[pospos], posData[1].Values[pospos], posData[2].Values[pospos], attFilter[0] * 57.29577951, attFilter[1] * 57.29577951, hdg);
+						sw.WriteLine("101,T={0}|{1}|{2}|{3}|{4}|{5}", posData[0].Values[pospos] / 1E7, posData[1].Values[pospos] / 1E7, posData[2].Values[pospos] / 1E3, attFilter[0] * 57.29577951, attFilter[1] * 57.29577951, hdg);
 						pospos++;
 					}
 					else

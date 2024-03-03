@@ -216,30 +216,28 @@ namespace SharpBladeFlightAnalyzer
 				return;
 			if(e.Data.GetDataPresent(DataFormats.FileDrop))
 			{
-				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-				
-				startLoadFile(files[0]);
-				
+				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);				
+				startLoadFile(files[0]);				
 			}
 		}
 
-		private void loadFile(string path)
-		{			
-			ULogFile f = new ULogFile();
-			if (f.Load(path, fieldConfigs))
-			{
-				LogPageControl lpc = new LogPageControl(f, this);
-				lpc.addFieldBtn.Click += AddFieldBtn_Click;
-				TabPage page = new TabPage();
-				page.Header = f.File.Name;
+		//private void loadFile(string path)
+		//{			
+		//	ULogFile f = new ULogFile();
+		//	if (f.Load(path, fieldConfigs))
+		//	{
+		//		LogPageControl lpc = new LogPageControl(f, this);
+		//		lpc.addFieldBtn.Click += AddFieldBtn_Click;
+		//		TabPage page = new TabPage();
+		//		page.Header = f.File.Name;
 
-				page.Content = lpc;
-				page.DisposableContent = f;
-				mainTabControl.Items.Insert(mainTabControl.Items.Count - 1, page);
-				mainTabControl.SelectedIndex = mainTabControl.Items.Count - 2;
-				currentPage = lpc;
-			}
-		}
+		//		page.Content = lpc;
+		//		page.DisposableContent = f;
+		//		mainTabControl.Items.Insert(mainTabControl.Items.Count - 1, page);
+		//		mainTabControl.SelectedIndex = mainTabControl.Items.Count - 2;
+		//		currentPage = lpc;
+		//	}
+		//}
 
 		private void startLoadFile(string path)
 		{
@@ -249,20 +247,31 @@ namespace SharpBladeFlightAnalyzer
 			Thread uiThread = new Thread(new ParameterizedThreadStart(updateUI));
 			uiThread.IsBackground = true;
 			uiThread.Start(path);
-			
 		}
 
 		private void updateUI(object o)
 		{
 			string path = (string)o;
+			lvm.LoadFailed = false;
 			Thread loadThread= new Thread(new ParameterizedThreadStart(loadingFile));
 			loadThread.IsBackground = true;
-			lvm.CurrProgress = 0;
-			lvm.Visibility = Visibility.Visible;
+			lvm.CurrProgress = 0;			
 			ULogFile f = new ULogFile();
 			loadThread.Start(new Tuple<ULogFile, string>(f, path));
-			Thread.Sleep(20);
+			while(f.TotalSize<0)
+			{
+				Thread.Sleep(20);
+				if(lvm.LoadFailed)
+				{
+					Dispatcher.Invoke(() => ShowMessageBox("无法打开文件"));
+					
+					isloading = false;
+					return;
+				}
+			}
+			
 			lvm.MaxProgress = f.TotalSize;
+			lvm.Visibility = Visibility.Visible;
 			while (true)
 			{
 				lvm.CurrProgress = f.CurrPos;
@@ -292,6 +301,8 @@ namespace SharpBladeFlightAnalyzer
 			Tuple<ULogFile, string> args = (Tuple<ULogFile, string>)o;
 			ULogFile f = args.Item1;
 			bool res = f.Load(args.Item2, fieldConfigs);
+			if (res == false)
+				lvm.LoadFailed = true;
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)

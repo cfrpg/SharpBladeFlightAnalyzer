@@ -13,6 +13,7 @@ namespace SharpBladeFlightAnalyzer
 	{
 		private static Dictionary<string, int> typeSize;
 		public static DateTime UnixStartTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+		const string AllMsgTypes = "BFIMPQARDLCSO";
 
 		UInt64 timestamp;
 		byte version;
@@ -103,7 +104,7 @@ namespace SharpBladeFlightAnalyzer
 		public List<MessageViewModel> MessageList { get => messageList; set => messageList = value; }
 		public Dictionary<string, MessageFormat> FormatList { get => formatList; set => formatList = value; }
 		public Dictionary<int, Message> MessageDict { get => messageDict; set => messageDict = value; }
-		public long TotalSize { get => reader.BaseStream.Length; }
+		public long TotalSize { get => reader == null ? -1 : reader.BaseStream.Length; }
 
 		public long CurrPos { get => currLoadPos; }
 		public bool ReadCompleted { get => readCompleted; set => readCompleted = value; }
@@ -122,8 +123,16 @@ namespace SharpBladeFlightAnalyzer
 
 		public bool Load(string path, Dictionary<string, FieldConfig> fieldConfigs)
 		{
-			file = new FileInfo(path);
-			reader = new BinaryReader(new FileStream(path, FileMode.Open));
+			file = new FileInfo(path);			
+			try
+			{
+				reader = new BinaryReader(new FileStream(path,FileMode.Open,FileAccess.Read));
+			}
+			catch
+			{				
+				return false;
+			}
+			
 			byte[] buff = reader.ReadBytes(8);
 			if (buff[0] != 0x55)
 				return false;
@@ -224,6 +233,7 @@ namespace SharpBladeFlightAnalyzer
 		{
 			if (reader.BaseStream.Length - reader.BaseStream.Position < 3)
 				return false;
+			long pos = reader.BaseStream.Position;
 			ushort size = reader.ReadUInt16();
 			byte msgtype = reader.ReadByte();
 			if (reader.BaseStream.Length - reader.BaseStream.Position < size)
@@ -275,11 +285,30 @@ namespace SharpBladeFlightAnalyzer
 				case 79://O
 					res = readDropoutMark(size);
 					break;
+				
 				default:
-					Debug.WriteLine("Unknow message type:{0},at {1}, size {2}.", msgtype, reader.BaseStream.Position,size);
+					if (msgtype == 0 && size==0)
+					{						
+						int blanklen = 0;
+						while (reader.BaseStream.Position != reader.BaseStream.Length)
+						{
+							byte b = reader.ReadByte();
+							if (b == 0)
+								blanklen++;
+							else
+								break;
+						}
+						Debug.WriteLine("Suspected blank data:at {0}, len {1}.", pos, blanklen);						
+					}
+					Debug.WriteLine("Unknow message type:{0},at {1}, size {2}.", msgtype, pos, size);
 					byte[] tmp= reader.ReadBytes(size);
 					res = false;
 					errmsg = "未知日志消息类型：" + msgtype.ToString();
+					Debug.WriteLine("Try to find the next package.");
+					if (!findNextData())
+					{
+						errmsg = "文件末端损坏";
+					}
 					break;
 			}
 			
@@ -300,6 +329,48 @@ namespace SharpBladeFlightAnalyzer
 			}
 			
 			return res;
+		}
+
+		private bool checkData(int thrd)
+		{			
+			long posbackup = reader.BaseStream.Position;
+
+			for(int i=0;i<thrd;i++)
+			{
+				if (reader.BaseStream.Length - reader.BaseStream.Position < 3)
+					return false;
+				ushort len = reader.ReadUInt16();
+				char msg = Convert.ToChar(reader.ReadByte());
+				if (reader.BaseStream.Length - reader.BaseStream.Position < len)
+					return false;
+				if (!AllMsgTypes.Contains(msg))
+					return false;
+				byte[] tmp = reader.ReadBytes(len);
+			}
+			reader.BaseStream.Position = posbackup;
+			return true;
+		}
+
+		private bool findNextData()
+		{
+			while(!checkData(3))
+			{				
+				while(true)
+				{
+					if (reader.BaseStream.Length - reader.BaseStream.Position < 3)
+						return false;
+					ushort len = reader.ReadUInt16();
+					char msg = Convert.ToChar(reader.ReadByte());
+					if (AllMsgTypes.Contains(msg))
+					{
+						reader.BaseStream.Position -= 3;
+						break;
+					}
+					reader.BaseStream.Position -= 2;
+				}
+			}
+			Debug.WriteLine("Find avalible data at {0}.", reader.BaseStream.Position);
+			return true;
 		}
 		private void expendDefinition()
 		{
@@ -483,7 +554,7 @@ namespace SharpBladeFlightAnalyzer
 							parameters[i].SystemDefaultValue = v;
 						if ((defaultType & 0x02) != 0)
 							parameters[i].AirframeDefaultValue = v;
-					}					
+					}
 				}
 			}
 			return true;
